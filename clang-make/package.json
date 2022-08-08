@@ -1,0 +1,8 @@
+{
+  "name": "clang-make",
+  "version": "0.0.1",
+  "dependencies": {
+    "@swc/core": "^1.2.218",
+    "@types/node": "^18.6.1"
+  }
+}

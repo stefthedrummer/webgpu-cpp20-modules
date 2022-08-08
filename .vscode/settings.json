@@ -1,0 +1,15 @@
+{
+    "git.ignoreLimitWarning": true,
+    "liveServer.settings.port": 80,
+    "liveServer.settings.host": "localhost",
+    "files.associations": {
+        "*.cppm": "cpp",
+    },
+    "clangd.arguments": [
+        "--log=verbose"
+    ],
+    "clang-format.language.cpp.style": "file",
+    "clang-format.fallbackStyle": "google",
+    "clang-format.language.apex.enable": false
+    
+}

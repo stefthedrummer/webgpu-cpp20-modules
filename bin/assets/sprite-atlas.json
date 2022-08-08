@@ -1,0 +1,89 @@
+{ "textures": [
+	{
+		"id": "terrain",
+		"width": 1280,
+		"height": 1280,
+		"spriteSheets": [
+			{
+				"spriteIndexOffset": 0,
+				"sprites": [
+					{ "x": 0, "y": 0, "height": 1278 },
+					{ "x": 0, "y": 1278, "height": 1278 }
+				]
+			}
+		]
+	},
+	{
+		"id": "tiles",
+		"width": 320,
+		"height": 320,
+		"spriteSheets": [
+			{
+				"spriteIndexOffset": 0,
+				"sprites": [
+					{ "x": 1280, "y": 1278, "height": 160 },
+					{ "x": 1600, "y": 1278, "height": 160 },
+					{ "x": 0, "y": 2556, "height": 160 },
+					{ "x": 320, "y": 2556, "height": 160 },
+					{ "x": 640, "y": 2556, "height": 160 },
+					{ "x": 960, "y": 2556, "height": 160 },
+					{ "x": 1280, "y": 2556, "height": 160 },
+					{ "x": 1600, "y": 2556, "height": 160 },
+					{ "x": 0, "y": 2716, "height": 160 },
+					{ "x": 320, "y": 2716, "height": 160 },
+					{ "x": 640, "y": 2716, "height": 160 },
+					{ "x": 960, "y": 2716, "height": 160 },
+					{ "x": 1280, "y": 2716, "height": 160 },
+					{ "x": 1600, "y": 2716, "height": 160 },
+					{ "x": 0, "y": 2876, "height": 160 },
+					{ "x": 320, "y": 2876, "height": 160 }
+				]
+			},
+			{
+				"spriteIndexOffset": 16,
+				"sprites": [
+					{ "x": 640, "y": 2876, "height": 160 },
+					{ "x": 960, "y": 2876, "height": 160 },
+					{ "x": 1280, "y": 2876, "height": 160 },
+					{ "x": 1600, "y": 2876, "height": 160 },
+					{ "x": 0, "y": 3036, "height": 160 },
+					{ "x": 320, "y": 3036, "height": 160 },
+					{ "x": 640, "y": 3036, "height": 160 },
+					{ "x": 960, "y": 3036, "height": 160 },
+					{ "x": 1280, "y": 3036, "height": 160 },
+					{ "x": 1600, "y": 3036, "height": 160 },
+					{ "x": 0, "y": 3196, "height": 160 },
+					{ "x": 320, "y": 3196, "height": 160 },
+					{ "x": 640, "y": 3196, "height": 160 },
+					{ "x": 960, "y": 3196, "height": 160 },
+					{ "x": 1280, "y": 3196, "height": 160 },
+					{ "x": 1600, "y": 3196, "height": 160 }
+				]
+			},
+			{
+				"spriteIndexOffset": 32,
+				"sprites": [
+					{ "x": 0, "y": 3356, "height": 160 },
+					{ "x": 320, "y": 3356, "height": 160 }
+				]
+			},
+			{
+				"spriteIndexOffset": 34,
+				"sprites": [
+					{ "x": 640, "y": 3356, "height": 239 },
+					{ "x": 960, "y": 3356, "height": 272 },
+					{ "x": 1280, "y": 3356, "height": 221 }
+				]
+			},
+			{
+				"spriteIndexOffset": 37,
+				"sprites": [
+					{ "x": 1600, "y": 3356, "height": 160 },
+					{ "x": 0, "y": 3628, "height": 160 },
+					{ "x": 320, "y": 3628, "height": 160 },
+					{ "x": 640, "y": 3628, "height": 160 }
+				]
+			}
+		]
+	}
+]}

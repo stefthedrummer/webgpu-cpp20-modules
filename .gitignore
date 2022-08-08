@@ -1,0 +1,9 @@
+bin/game.wasm
+bin/app.js.map
+bin/app.js
+bin/build/
+.cache/
+.vscode/*.log
+**/node_modules/
+**/package-lock.json
+compile_commands.json
