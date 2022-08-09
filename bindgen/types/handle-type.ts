@@ -22,6 +22,6 @@ export class HandleType<T> extends Type<T> {
         return `Engine.externref_table.get(${val.u32}) as ${this.iface.handleType_any.tsName}`;
     }
     js2cpp(ptr: Val, val: string): string {
-        return `missing`;
+        return `missing-handle-type`;
     }
 }

@@ -2,7 +2,7 @@ import { BindGen } from "../bindgen";
 import { cppifyName } from "../formatter";
 import { EnumFlagsType } from "./enum-flags-type";
 import { HandleType } from "./handle-type";
-import { HeapVal, ImmVal } from "./interop";
+import { HeapVal, ImmVal, size_t } from "./interop";
 import { Item } from "./item";
 import { FieldDef, StructType, StructTypeFlags } from "./struct-type";
 import { Type, Kind, AnyDef } from "./type";
@@ -72,11 +72,11 @@ export class FunctionDef<IFace, FnProp extends keyof IFace & string> extends Mem
     }
 };
 
-function mangeFunctionName(def: AnyDef): string {
+function mangeFunctionName(iface: Interface<any>, def: AnyDef): string {
     if (def instanceof FunctionDef) {
-        return `${def.prop}${def.paramDefs.length.toString()}`;
+        return `${iface.name}_${def.prop}${def.paramDefs.length.toString()}`;
     } else {
-        return `${def.prop}`;
+        return `${iface.name}_${def.prop}`;
     }
 }
 
@@ -124,13 +124,14 @@ export class Interface<T> extends Item {
             }
             if (memberDef.retType.kind == Kind.Handle) {
                 paramList.push(`_retHandle: number`);
+            } else if (memberDef.retType.kind == Kind.ValueType) {
+                paramList.push(`_ret: number`);
             }
 
             // ret:
             const fnParams = paramList.join(", ");
-            const fnRet = memberDef.retType.kind == Kind.ValueType ? "number" : "void";
 
-            srcTs.push(`\tstatic cpp_${mangeFunctionName(memberDef)}(${fnParams}): ${fnRet} {`);
+            srcTs.push(`\tstatic cpp_${mangeFunctionName(this, memberDef)}(${fnParams}): void {`);
             {
                 srcTs.push(`\t\tconst arg_this = ${this.handleType_any.cpp2js(new ImmVal("_this"))};`);
 
@@ -156,7 +157,8 @@ export class Interface<T> extends Item {
                 srcTs.push(`\t\t${retVal}arg_this.${memberDef.prop}${args};`);
 
                 if (memberDef.retType.kind == Kind.ValueType) {
-                    throw new Error("Unimplemented")
+                    srcTs.push(`\t\t${memberDef.retType.js2cpp(new HeapVal(new ImmVal("_ret")), "ret")};`);
+
                 } else if (memberDef.retType.kind == Kind.Handle) {
                     srcTs.push(`\t\tEngine.externref_table.set(_retHandle, ret);`);
                 }
@@ -183,12 +185,13 @@ export class Interface<T> extends Item {
             }
             if (memberDef.retType.kind == Kind.Handle) {
                 paramList.push("u32");
+            } else if (memberDef.retType.kind == Kind.ValueType) {
+                paramList.push(memberDef.retType.pointer(false).cppInteropName);
             }
 
             const params = paramList.join(", ");
-            const ret = memberDef.retType.kind == Kind.ValueType ? "u32" : "void";
 
-            srcCpp.push(`\tstatic wasm_import("cpp_${mangeFunctionName(memberDef)}") ${ret} cpp_${memberDef.prop}(${params});`);
+            srcCpp.push(`\tstatic wasm_import("cpp_${mangeFunctionName(this, memberDef)}") void cpp_${memberDef.prop}(${params});`);
         }
 
         srcCpp.push(`public:`);
@@ -216,18 +219,26 @@ export class Interface<T> extends Item {
             if (memberDef.retType.kind == Kind.Handle) {
                 paramList.push(`Scope* pScope`);
                 argList.push(`_retHandle`);
+            } else if (memberDef.retType.kind == Kind.ValueType) {
+                argList.push(`&_ret`);
             }
 
             const params = paramList.join(", ");
             const args = argList.join(", ");
 
-            srcCpp.push(`\tinline ${memberDef.retType.cppName} ${cppifyName(memberDef.prop)}(${params}) {`);
+            srcCpp.push(`\tinline ${memberDef.retType.cppName} ${cppifyName(memberDef.prop)}(${params}) const {`);
             if (memberDef.retType.kind == Kind.Handle) {
                 srcCpp.push(`\t\tu32 const _retHandle = pScope->externrefScope.AcquireLocal();`);
+            } else if (memberDef.retType.kind == Kind.ValueType) {
+                srcCpp.push(`\t\t${memberDef.retType.cppName} _ret{};`);
             }
+
             srcCpp.push(`\t\tI${this.name}::cpp_${memberDef.prop}(${args});`);
+
             if (memberDef.retType.kind == Kind.Handle) {
                 srcCpp.push(`\t\treturn ${memberDef.retType.cppName}{_retHandle};`);
+            } else if (memberDef.retType.kind == Kind.ValueType) {
+                srcCpp.push(`\t\treturn _ret;`);
             }
             srcCpp.push(`\t}`);
 
@@ -252,7 +263,7 @@ export class Interface<T> extends Item {
                 const args = argList.join(", ");
                 const ret = (memberDef.retType.kind != Kind.Void) ? "return " : "";
 
-                srcCpp.push(`\tinline ${memberDef.retType.cppName} ${cppifyName(memberDef.prop)}(${params}) {`);
+                srcCpp.push(`\tinline ${memberDef.retType.cppName} ${cppifyName(memberDef.prop)}(${params}) const {`);
                 srcCpp.push(`\t\t${ret}this->${cppifyName(memberDef.prop)}(${args});`);
                 srcCpp.push(`\t}`);
             }

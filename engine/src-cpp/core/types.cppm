@@ -3,6 +3,7 @@ export module core.types;
 export {
 
 using u8 = unsigned char;
+using i8 = signed char;
 using u16 = unsigned short;
 using u32 = unsigned long;
 using u64 = unsigned long long;

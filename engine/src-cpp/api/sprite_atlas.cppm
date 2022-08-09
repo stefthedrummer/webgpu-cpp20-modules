@@ -3,7 +3,7 @@ import core.types;
 import core.allocator;
 import core.array;
 #define wasm_import(name) __attribute__((import_name(name)))
-export {
+export  {
 struct AtlasSprite {
 	u32 x;
 	u32 y;

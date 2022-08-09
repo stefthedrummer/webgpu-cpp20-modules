@@ -5,10 +5,9 @@ export const Colors = {
     warning: "\x1b[33m",
     compile: "\x1b[34m",
     info: "\x1b[30m",
-    success: "\x1b[32m"
+    success: "\x1b[32m",
+    note: "\x1b[36m"
 }
-
-
 
 export function logExecution(stream: (msg: string) => void, artifactId: ArtifactId, color: string, msg: string, milliseconds: number = 0) {
     const id = ArtifactIds.split(artifactId);
@@ -23,4 +22,14 @@ export function logArtifact(stream: (msg: string) => void, artifactId: ArtifactI
 
 export function log(stream: (msg: string) => void, color: string, msg: string) {
     stream(`${color}${msg}\x1b[0m`);
+}
+
+const g_clangNotePattern = /^.*note:(?:.|[\n\r])+?\^/gm;
+const g_newLinePattern = /\r?\n/gm;
+
+export function logDiagnostics(stream: (msg: string) => void, color: string, noteColor: string, msg: string) {
+    const prettyMsg = msg.replace(g_clangNotePattern, note => {
+        return note.split(g_newLinePattern).map(line => `${noteColor}\t${line}${color}`).join("\n");
+    });
+    stream(`${color}${prettyMsg}\x1b[0m`);
 }

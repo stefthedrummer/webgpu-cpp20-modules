@@ -118,7 +118,10 @@ const t_GPUTexture = bindGen.defineInterface<GPUTexture>("GPUTexture", [
     new FunctionDef("createView", t_GPUTextureView.handleType_local, []),
     new FunctionDef("createView", t_GPUTextureView.handleType_local, [
         new ParamDef("descriptor", t_GPUTextureViewDescriptor.pointer())
-    ])
+    ]),
+    new PropertyDef("format", t_GPUTextureFormat),
+    new PropertyDef("width", t_U32Type),
+    new PropertyDef("height", t_U32Type),
 ]);
 
 
@@ -499,6 +502,10 @@ const t_GPUCanvasContext = bindGen.defineInterface<GPUCanvasContext>("GPUCanvasC
         new ParamDef("configuration", t_GPUCanvasConfiguration.pointer())
     ]),
     new FunctionDef("getCurrentTexture", t_GPUTexture.handleType_local, [])
+]);
+
+const t_GPU = bindGen.defineInterface<GPU>("GPU", [
+    new FunctionDef("getPreferredCanvasFormat", t_GPUTextureFormat, [])
 ]);
 
 

@@ -2,98 +2,46 @@
 export module rendering.resource_manager;
 import api;
 import core;
-
-export struct Vertex {
-    vec2<f32> pos;
-    f32 __padding0{};
-    f32 w{1.0f};
-    vec2<f32> uv;
-    f32 __padding2{};
-    f32 __padding3{};
-
-    Vertex(vec2<f32> pos, vec2<f32> uv) : pos{pos}, uv{uv} {} 
-};
+import webgpu;
 
 export struct ResourceManager {
 
-    Array<PersistentHandle<IGPUTexture>, Heap> hTextures{ 0, nullptr };
+    Array<Texture<rgba<u8>>, Heap> atlas{ 0, nullptr };
     
-    template<typename TVertex>
-    PersistentHandle<IGPUBuffer> CreateVertexBuffer(Array<TVertex> vertices, Handle<IGPUDevice> hDevice) {
-        Scope scope{ 4 };
-
-        auto hVertexBuffer = !hDevice->CreateBuffer(GPUBufferDescriptor{
-            .size = vertices.length() * sizeof(TVertex),
-            .usage = GPUBufferUsageFlags::VERTEX | GPUBufferUsageFlags::COPY_DST
-            }, &scope);
-
-        hDevice->Queue(&scope)->WriteBuffer(WriteBufferParamStruct{
-            .buffer = hVertexBuffer,
-            .bufferOffset = 0,
-            .data = Array<u8>{ vertices.length() * sizeof(TVertex), (u8*)vertices.mem.pElements},
-            .dataOffset = 0,
-            .size = vertices.length() * sizeof(Vertex)
-            });
-
-        return hVertexBuffer;
-    }
-
-    void CreateAtlas(Atlas* pAtlas, Image<Borrow>* pAtlasImg, Handle<IGPUDevice> hDevice) {
+    static Array<Texture<rgba<u8>>, Heap> CreateAtlas(GPU const* pGpu, Atlas* pAtlas, Image<Borrow>* pAtlasImg) {
         Scope scope{ 32 };
 
-        auto hQueue{ hDevice->Queue(&scope) };
-        Array<PersistentHandle<IGPUTexture>, Heap> hTextures{ pAtlas->textures.length() };
+        auto hQueue{ pGpu->_hDevice->Queue(&scope) };
+        Array<Texture<rgba<u8>>, Heap> textures{ pAtlas->textures.Length() };
 
-        for (u32 iTexture = 0; iTexture < pAtlas->textures.length(); iTexture++) {
+        for (u32 iTexture = 0; iTexture < pAtlas->textures.Length(); iTexture++) {
             auto pTexture = &pAtlas->textures[iTexture];
 
             u32 numLayers = 0;
-            for (u32 iSheet = 0; iSheet < pTexture->spriteSheets.length(); iSheet++) {
+            for (u32 iSheet = 0; iSheet < pTexture->spriteSheets.Length(); iSheet++) {
                 auto pSheet = &pTexture->spriteSheets[iSheet];
-                numLayers += pSheet->sprites.length();
+                numLayers += pSheet->sprites.Length();
             }
 
-            auto hTexture = !hDevice->CreateTexture(GPUTextureDescriptor{
-                .size = {.width = pTexture->width, .height = pTexture->height, .depthOrArrayLayers = numLayers },
-                .format = GPUTextureFormat::RGBA8UNorm,
-                .usage = GPUTextureUsageFlags::TEXTURE_BINDING | GPUTextureUsageFlags::COPY_DST
-                }, &scope);
-
+            auto texture = pGpu->CreateTexture<rgba<u8>>({pTexture->width, pTexture->height }, numLayers);
             Format::Log("[Atlas:CreateTexture]", "width=", pTexture->width, "height=", pTexture->height);
 
-            hTextures[iTexture] = hTexture;
+            textures[iTexture] = texture;
 
-            for (u32 iSheet = 0; iSheet < pTexture->spriteSheets.length(); iSheet++) {
+            for (u32 iSheet = 0; iSheet < pTexture->spriteSheets.Length(); iSheet++) {
                 auto pSheet = &pTexture->spriteSheets[iSheet];
 
-                for (u32 iSprite = 0; iSprite < pSheet->sprites.length(); iSprite++) {
+                for (u32 iSprite = 0; iSprite < pSheet->sprites.Length(); iSprite++) {
                     auto pSprite = &pSheet->sprites[iSprite];
 
                     Image<Heap> spriteImg = pAtlasImg->CreateSubImage(
                         pSprite->x, pSprite->y, pTexture->width, pSprite->height, true);
 
-                    hQueue->WriteTexture(WriteTextureParamStruct{
-                        .destination = GPUImageCopyTexture{
-                            .texture = hTexture,
-                            .origin = {.z = pSheet->spriteIndexOffset + iSprite}
-                        },
-                        .data = Array<u8>{
-                            spriteImg.width * spriteImg.height * (u32)sizeof(Texel),
-                            (u8*)spriteImg.mem.pElements,
-                        },
-                        .dataLayout = GPUImageDataLayout{
-                            .bytesPerRow = spriteImg.width * (u32)sizeof(Texel),
-                            .rowsPerImage = spriteImg.height
-                        },
-                        .size = GPUExtent3DDict{
-                            .width = spriteImg.width,
-                            .height = spriteImg.height
-                        }
-                        });
+                    pGpu->WriteTexture(&texture, &spriteImg, pSheet->spriteIndexOffset + iSprite);
                 }
             }
         }
 
-        this->hTextures = move(hTextures);
+        return textures;
     }
 };

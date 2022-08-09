@@ -10,36 +10,30 @@ export{
 
 
 template<typename T, Allocator TAllocator = Borrow>
-struct Array : TAllocator::template Base<T, TAllocator, Array, T>  {
-    template<typename, Allocator> friend class Array;
-
-    using AllocatorHandle = typename TAllocator::Handle;
-    using Base = typename TAllocator::template Base<T, TAllocator, Array, T>;
+struct Array : TAllocator::template TBase<T, TAllocator, Array, T>  {
+    using TAllocatorHandle = typename TAllocator::Handle;
+    using TBase = typename TAllocator::template TBase<T, TAllocator, Array, T>;
 
     inline constexpr Array() :
-        Base{} {}
+        TBase{} {}
 
-    inline constexpr Array(u32 length, T* pElements, AllocatorHandle allocatorHandle = AllocatorHandle{}) :
-        Base{ length, pElements } {}
+    inline constexpr Array(u32 length, T* pElements, TAllocatorHandle allocatorHandle = TAllocatorHandle{}) :
+        TBase{ length, pElements } {}
 
-    inline constexpr Array(u32 length, AllocatorHandle allocatorHandle = AllocatorHandle{}) :
-        Base{ length, allocatorHandle } {}
+    inline constexpr Array(u32 length, TAllocatorHandle allocatorHandle = TAllocatorHandle{}) :
+        TBase{ length, allocatorHandle } {}
 
-    inline constexpr Array(std::initializer_list<T> init, AllocatorHandle allocatorHandle = AllocatorHandle{}) :
-        Base{ init.size(), allocatorHandle } {
-
-        __builtin_memcpy(this->mem.pElements, init.begin(), init.size() * sizeof(T));
+    static inline constexpr Array<T, TAllocator> From(std::initializer_list<T> init, TAllocatorHandle allocatorHandle = TAllocatorHandle{}) {
+        Array<T, TAllocator> array{ init.size(), allocatorHandle };
+        __builtin_memcpy(array.pElements, init.begin(), init.size() * sizeof(T));
+        return array;
     }
 
-    inline constexpr u32 length() { return this->mem.length; }
+    inline constexpr u32 Length() { return this->length; }
 
     inline constexpr T& operator [] (u32 index) {
-        CHECK_BOUNDS<u32>(index, 0, this->mem.length);
-        return this->mem.pElements[index];
-    }
-
-    Array<T, Borrow> operator ~() {
-         return move((Array<T, Borrow>)*this);
+        CHECK_BOUNDS<u32>(index, 0, this->length);
+        return this->pElements[index];
     }
 };
 

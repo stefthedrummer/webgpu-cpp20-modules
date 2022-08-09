@@ -38,7 +38,8 @@ export type BindGenConfig = {
     tsOut: string,
     cppImports: string[],
     tsImports: Record<string, string[]>,
-    moduleName: string
+    moduleName: string,
+    namespace?: string
 };
 
 export class BindGen {
@@ -60,7 +61,9 @@ export class BindGen {
             "cpp_decode_BufferSource",
             "size_t",
             "cpp_encode_Array_Borrow",
-            "cpp_encode_Array_Heap"
+            "cpp_encode_Array_Heap",
+            "cpp_enum_literals",
+            "cpp_enum_define_literals"
         ];
 
         this.srcCpp = [];
@@ -68,7 +71,7 @@ export class BindGen {
             `export module ${config.moduleName};`,
             ...config.cppImports.map(e => `import ${e};`),
             "#define wasm_import(name) __attribute__((import_name(name)))",
-            "export {"
+            `export ${this.config.namespace ? `namespace ${this.config.namespace}` : ""} {`
         ];
         this.srcCppFooter = [
             "}"

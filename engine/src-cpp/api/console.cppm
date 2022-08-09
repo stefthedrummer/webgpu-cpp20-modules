@@ -9,7 +9,9 @@ export {
 namespace ErrorCode {
     constexpr char const* IndexOutOfBounds = "[WASM] IndexOutOfBounds";
     constexpr char const* HandleStackOverflow = "[WASM] HandleStackOverflow";
+    constexpr char const* VirtualStackStackOverflow = "[WASM] VirtualStackStackOverflow";
     constexpr char const* ResourceAlreadyReleased = "[WASM] ResourceAlreadyReleased";
+    constexpr char const* MemoryAlreadyFreed = "[WASM] MemoryAlreadyFreed";
 }
 
 namespace Console {

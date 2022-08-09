@@ -1,5 +1,5 @@
 import { Engine } from "./engine";
-import { cpp_decode_optional, cpp_decode_Array, cpp_decode_String, cpp_decode_Record, cpp_decode_BufferSource, size_t, cpp_encode_Array_Borrow, cpp_encode_Array_Heap } from "./bindgen-api";
+import { cpp_decode_optional, cpp_decode_Array, cpp_decode_String, cpp_decode_Record, cpp_decode_BufferSource, size_t, cpp_encode_Array_Borrow, cpp_encode_Array_Heap, cpp_enum_literals, cpp_enum_define_literals } from "./bindgen-api";
 export enum ResourceType {
 	Text = 1,
 	Image = 2,

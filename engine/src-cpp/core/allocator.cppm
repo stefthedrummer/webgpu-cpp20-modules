@@ -4,19 +4,15 @@ import api.console;
 export import core.meta;
 export import core.types;
 import core.wasm;
+import core.debug;
+
 export{
 
 struct Borrow;
 struct Heap;
 
-template<typename T, typename TAllocator>
+template<typename T>
 struct Memory {
-    using ElementType = T;
-    using AllocatorHandle = typename TAllocator::Handle;
-
-    static_assert(sizeof(AllocatorHandle) <= sizeof(size_t));
-    
-    AllocatorHandle allocatorHandle;
     u32 length;
     T* pElements;
 
@@ -24,22 +20,42 @@ struct Memory {
 
     Memory(u32 length, T* pElements) :
         length{ length },
-        pElements{ pElements },
+        pElements{ pElements } {}
+    
+    inline constexpr Memory<u8> AsRawMemory() const {
+        return Memory<u8>{ this->length * sizeof(T), (u8*)this->pElements };
+    }
+};
+
+template<typename T, typename TAllocator>
+struct ManagedMemory : Memory<T> {
+    using ElementType = T;
+    using AllocatorHandle = typename TAllocator::Handle;
+    static_assert(sizeof(AllocatorHandle) <= sizeof(size_t));
+
+protected:
+    ManagedMemory(ManagedMemory&) = default;
+    ManagedMemory(ManagedMemory&&) = delete;
+    ManagedMemory& operator= (ManagedMemory&) = default;
+    ManagedMemory& operator= (ManagedMemory&&) = delete;
+
+public:
+    AllocatorHandle allocatorHandle;
+
+    ManagedMemory() = default;
+
+    ManagedMemory(u32 length, T* pElements) :
+        Memory<T>{ length, pElements },
         allocatorHandle{} {}
 
-    Memory(u32 length, AllocatorHandle allocatorHandle) :
-        length{ length },
-        pElements{ (T*)allocatorHandle.Alloc(length * sizeof(T)) },
+    ManagedMemory(u32 length, AllocatorHandle allocatorHandle) :
+        Memory<T>{ length, (T*)allocatorHandle.Alloc(length * sizeof(T)) },
         allocatorHandle{ allocatorHandle } {}
 
-    ~Memory() {
-        allocatorHandle.Free(&pElements);
-    }
-
-    Memory<T, TAllocator> Copy(AllocatorHandle copyAllocatorHandle = AllocatorHandle{}) {
-        Memory<T, TAllocator> copy{ this->length, copyAllocatorHandle };
-        __builtin_memcpy( copy.pElements, this->pElements, this->length * sizeof(T));
-        return move(copy);
+    ~ManagedMemory() {
+        this->allocatorHandle.Free(this->pElements);
+        this->pElements = nullptr;
+        this->length = 0;
     }
 };
 
@@ -51,54 +67,70 @@ concept Allocator = requires(typename T::Handle ah, u32 size, void* pPtr) {
     ah.Free(pPtr);
 };
 
-template<typename T, Allocator TAllocator, template<typename...> typename TTemplate, typename... Tn>
-struct Owned {
-    using AllocatorHandle = typename TAllocator::Handle;
+template<typename T, Allocator TAllocator, template<typename...> typename TGenericSelf, typename... Tn>
+struct Owned : ManagedMemory<T, TAllocator> {
+    using TAllocatorHandle = typename TAllocator::Handle;
+    using TBorrow = TGenericSelf<Tn..., Borrow>;
+    using THeap = TGenericSelf<Tn..., Heap>;
+
+protected:
+    Owned(Owned&) = default;
+    Owned(Owned&&) = delete;
+    Owned& operator= (Owned&) = default;
+    Owned& operator= (Owned&&) = delete;
+
 public:
-    Memory<T, TAllocator> mem;
     Owned() = default;
-    Owned(Owned&&) = default;
-    Owned(Owned&) = delete;
-    Owned(Memory<T, TAllocator> mem) : mem{mem} {};
-    Owned& operator= (Owned&&) = default;
+    Owned(u32 length, T* pElements) : ManagedMemory<T, TAllocator>{length, pElements} {}
+    Owned(u32 length, TAllocatorHandle allocatorHandle) : ManagedMemory<T, TAllocator>{length, allocatorHandle} {}
 
-    Owned(u32 length, T* pElements) : mem{length, pElements} {}
-    Owned(u32 length, AllocatorHandle allocatorHandle) : mem{length, allocatorHandle} {}
-
-
-    TTemplate<Tn..., Heap> Copy() {
-        TTemplate<Tn..., Heap> copy/*{}*/;
-        __builtin_memcpy(&copy, this, sizeof(TTemplate<Tn..., TAllocator>));
-        copy.mem = copy.mem.Copy();
+    /*THeap Copy() {
+        THeap copy{};
+        __builtin_memcpy(&copy, this, sizeof(TGenericSelf<Tn..., TAllocator>));
+        copy.pElements = (T*)TAllocatorHandle{}.Alloc(this->length * sizeof(T));
+        __builtin_memcpy(copy.pElements, this->pElements, this->length * sizeof(T));
         return move(copy);
+    }*/
+
+    operator TBorrow() {
+        TBorrow borrow{};
+        __builtin_memcpy(&borrow, this, sizeof(TBorrow));
+        return borrow;
     }
     
-    operator TTemplate<Tn..., Borrow>() {
-        TTemplate<Tn..., Borrow> borrow;
-         __builtin_memcpy(&borrow, this, sizeof(TTemplate<Tn..., Borrow>));
-         return move(borrow);
+    TBorrow operator ~() {
+        return (TBorrow)*this;
+    }
+
+    TBorrow* operator &() {
+        return reinterpret_cast<TBorrow*>(this);
+    }
+
+    void operator <=(Owned&& o) {
+        this->allocatorHandle.Free(this->pElements);
+        
+        //this->pElements = nullptr; (overridden anyways)
+        //this->length = 0; (overridden anyways)
+        __builtin_memcpy(this, &o, sizeof(Owned));
+
+        o.pElements = nullptr;
+        o.length = 0;
     }
 };
 
 
-template<typename T, Allocator TAllocator, template<typename...> typename TTemplate, typename... Tn>
-struct Borrowed {
-    using AllocatorHandle = typename TAllocator::Handle;
+template<typename T, Allocator TAllocator, template<typename...> typename TGenericSelf, typename... Tn>
+struct Borrowed : ManagedMemory<T, TAllocator> {
+    using TAllocatorHandle = typename TAllocator::Handle;
+    using TBorrow = TGenericSelf<Tn..., Borrow>;
+
 public:
-    Memory<T, TAllocator> mem;
     Borrowed() = default;
-    Borrowed(Memory<T, TAllocator> mem) : mem{mem} {};
     Borrowed(Borrowed&&) = default;
     Borrowed(Borrowed&) = default;
 
-    Borrowed(u32 length, T* pElements) : mem{length, pElements} {}
-    Borrowed(u32 length, AllocatorHandle allocatorHandle) : mem{length, allocatorHandle} {}
-
-    operator TTemplate<Tn..., Borrow>() {
-        TTemplate<Tn..., Borrow> borrow;
-         __builtin_memcpy(&borrow, this, sizeof(TTemplate<Tn..., Borrow>));
-         return move(borrow);
-    }
+    Borrowed(u32 length, T* pElements) : ManagedMemory<T, TAllocator>{length, pElements} {}
+    Borrowed(u32 length, TAllocatorHandle allocatorHandle) : ManagedMemory<T, TAllocator>{length, allocatorHandle} {}
 };
 
 
@@ -111,18 +143,49 @@ struct Borrow {
         inline void Free(void* pPtr) {}
     };
 
-    template<typename T, Allocator TAllocator, template<typename...> typename TTemplate, typename... Tn>
-    using Base = Borrowed<T, TAllocator, TTemplate, Tn...>;
+    template<typename T, Allocator TAllocator, template<typename...> typename TGenericSelf, typename... Tn>
+    using TBase = Borrowed<T, TAllocator, TGenericSelf, Tn...>;
+};
+
+struct AllocatorDebugToken {
+    u32 token0;
+    u32 _padding0;
 };
 
 struct Heap {
     struct Handle {
-        inline static void* Alloc(u32 size) { return malloc(size); }
-        inline static void Free(void* pPtr) { free(pPtr); }
+        inline static void* Alloc(u32 size) {
+            if constexpr (DEBUG) {
+                void* pDebugPtr = malloc(sizeof(AllocatorDebugToken) + size);
+                AllocatorDebugToken* pToken = (AllocatorDebugToken*)pDebugPtr;
+                pToken->token0 = 0xDBDBDBDB;
+                void* pPtr = (u8*)pDebugPtr + sizeof(AllocatorDebugToken);
+                return pPtr;
+
+            } else {
+                return malloc(size);
+            }
+        }
+        inline static void Free(void* pPtr) {
+            if constexpr (DEBUG) {
+                if(pPtr == nullptr) {
+                } else {
+                    void* pDebugPtr = (u8*)pPtr - sizeof(AllocatorDebugToken);
+                    AllocatorDebugToken* pToken = (AllocatorDebugToken*)pDebugPtr;
+                    if(pToken->token0 != 0xDBDBDBDB) {
+                        Console::Panic(ErrorCode::MemoryAlreadyFreed);
+                    }
+                    pToken->token0 = 0;
+                    free(pDebugPtr);
+                }
+            } else {
+                free(pPtr);
+            }
+        }
     };
 
-    template<typename T, Allocator TAllocator, template<typename...> typename TTemplate, typename... Tn>
-    using Base = Owned<T, TAllocator, TTemplate, Tn...>;
+    template<typename T, Allocator TAllocator, template<typename...> typename TGenericSelf, typename... Tn>
+    using TBase = Owned<T, TAllocator, TGenericSelf, Tn...>;
 };
 
 }

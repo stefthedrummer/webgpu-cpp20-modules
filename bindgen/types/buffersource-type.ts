@@ -6,10 +6,10 @@ export class BufferSourceType extends Type<Uint8Array> {
 
     constructor() {
         super({
-            sizeOf: ArrayType.sizeOf_header + size_t,
+            sizeOf: ArrayType.t_Memory_sizeof,
             alignOf: size_t,
             kind: Kind.ValueType,
-            cppName: `Array<u8>`,
+            cppName: `Memory<u8>`,
             cppInteropName: null,
             tsName: `BufferSource`,
             isOptionalAllowed: false,

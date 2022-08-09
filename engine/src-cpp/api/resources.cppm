@@ -4,7 +4,7 @@ import core.types;
 import core.buffer;
 import api.bindgen;
 #define wasm_import(name) __attribute__((import_name(name)))
-export {
+export  {
 enum class ResourceType: u32 {
 	Text = 1,
 	Image = 2,

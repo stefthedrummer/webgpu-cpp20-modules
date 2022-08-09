@@ -26,9 +26,9 @@ export class EnumLiteralsType<T extends string> extends Type<T> {
     }
 
     generateTs(srcTs: string[]): void {
-        srcTs.push(`const cpp_enum_${this.tsName}: ${this.tsName}[] = [`);
+        srcTs.push(`const cpp_enum_${this.tsName} = cpp_enum_define_literals<${this.tsName}>(`);
         srcTs.push(`\tundefined!, ${this.values.map(e => `"${e}"`).join(", ")}`);
-        srcTs.push(`];`);
+        srcTs.push(`);`);
     }
 
     generateDefaultValExpr(val: T): string {
@@ -39,6 +39,6 @@ export class EnumLiteralsType<T extends string> extends Type<T> {
         return `cpp_enum_${this.tsName}[${val.u32}]`;
     }
     js2cpp(ptr: Val, val: string): string {
-        return `missing`;
+        return ptr.set_u32(`cpp_enum_${this.tsName}.lookup.get(${val}) || 0`);
     }
 };

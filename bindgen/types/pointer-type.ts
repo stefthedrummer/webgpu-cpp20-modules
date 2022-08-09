@@ -13,8 +13,8 @@ export class PointerType<T> extends Type<T> {
             sizeOf: size_t,
             alignOf: size_t,
             kind: Kind.ReferenceType,
-            cppName: `${valType.cppName}*`,
-            cppInteropName: "u32",
+            cppName: `${valType.cppName}${isConst ? " const" : ""}*`,
+            cppInteropName: `${valType.cppName}${isConst ? " const" : ""}*`,
             tsName: valType.tsName,
             isOptionalAllowed: false,
             isConst: isConst
@@ -29,6 +29,6 @@ export class PointerType<T> extends Type<T> {
     }
 
     cppArg(arg: string): string { return `p${cppifyName(arg)}`; }
-    cppParam(param: string): string { return `${this.valType.cppName} ${this.isConst ? "const" : ""}* p${cppifyName(param)}`; }
+    cppParam(param: string): string { return `${this.cppName} p${cppifyName(param)}`; }
     tryRValueRef(): Type<T> { return new PointerAsRValueRefType(this); }
 }

@@ -4,14 +4,16 @@ import { t_BoolType } from "./types";
 
 export class ArrayType<T> extends Type<T[]> {
 
-    static sizeOf_header = 8;
+    static t_Memory_sizeof = 8;
+    static t_Array_sizeof = 12;
+    static t_Array_pElement = 8;
 
     constructor(
         public readonly elementType: Type<T>,
         public readonly allocator: Allocator) {
 
         super({
-            sizeOf: ArrayType.sizeOf_header + size_t,
+            sizeOf: ArrayType.t_Array_sizeof,
             alignOf: size_t,
             kind: Kind.ValueType,
             cppName: `Array<${elementType.cppName}${allocator ? `, ${allocator}` : ""}>`,

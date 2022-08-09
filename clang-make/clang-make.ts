@@ -12,7 +12,7 @@ const config: Config = {
     srcDirs: [
         "engine/src-cpp",
         "engine/src-wat",
-        "app",
+        "app"
     ],
     buildDir: "bin/build",
     distDit: "bin",
@@ -21,13 +21,59 @@ const config: Config = {
         "-std=c++20",
         "-fmodules",
         "-mbulk-memory",
-        "-O2",
+        "-ffast-math",
+        //"-O2",
         "-fno-rtti",
+        //"-frtti",
+        //"-flto",
+        "-g"
+    ],
+    clangCArguments: [
+        "--target=wasm32-wasi",
+        //"-O2",
+        "-flto"
+    ],
+    clangdArguments: [
+        "--target=wasm32-wasi",
+        "-std=c++20",
+        "-fmodules",
+    ],
+    wasmldArguments: [
+        "--no-entry",
+        //"-O3",
+        //"--lto-O3",
+        //"--strip-all",
+        //"--gc-sections"
+    ],
+    wat2wasmArguments: [
+        "-r"
+    ]
+};
+
+new Project(config)
+    .addSourceArtifacts(Cppm, Cpp, Wat)
+    .collectSources()
+    .emitArtifact(new CompileCommandsJson("compile_commands:json", FileInfo.create(".", "compile_commands", "json")))
+    .emitArtifact(new AppWasm("app:wasm", FileInfo.create(config.distDit, "game", "wasm")))
+    .build(Stage.Link, false);
+
+
+
+    /*
+clangCppArguments: [
+        "--target=wasm32-wasi",
+        "-std=c++20",
+        "-fmodules",
+        "-mbulk-memory",
+        "-ffast-math",
+        //"-O2",
+        "-fno-rtti",
+        //"-frtti",
         "-flto"
     ],
     clangCArguments: [
         "--target=wasm32-wasi",
-        "-O2",
+        //"-O2",
         "-flto"
     ],
     clangdArguments: [
@@ -45,11 +91,5 @@ const config: Config = {
     wat2wasmArguments: [
         "-r"
     ]
-};
 
-new Project(config)
-    .addSourceArtifacts(Cppm, Cpp, Wat)
-    .collectSources()
-    .emitArtifact(new CompileCommandsJson("compile_commands:json", FileInfo.create(".", "compile_commands", "json")))
-    .emitArtifact(new AppWasm("app:wasm", FileInfo.create(config.distDit, "game", "wasm")))
-    .build(Stage.Link, false);
+    */

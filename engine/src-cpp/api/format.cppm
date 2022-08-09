@@ -11,10 +11,12 @@ namespace Format {
 
     enum class ArgType : u32 {
         Int = 1,
-        Chars = 2
+        Float = 2,
+        Chars = 3
     };
 
     template<typename T>   inline constexpr ArgType arg_type = ArgType::Int;
+    template<>             inline constexpr ArgType arg_type<float> = ArgType::Float;
     template<>             inline constexpr ArgType arg_type<char const*> = ArgType::Chars;
 
     struct Arg {
@@ -29,7 +31,7 @@ namespace Format {
         inline void Format(u32 loggerFn, Tn... args) {
             constexpr u32 numArgs = sizeof...(Tn);
 
-            Arg wrappedArgs[numArgs] = { Arg{arg_type<Tn>, (size_t)args}... };
+            Arg wrappedArgs[numArgs] = { Arg{arg_type<Tn>, *((size_t*)&args)}... };
 
             Array<Arg, Borrow> array{ numArgs, wrappedArgs };
             cpp_format(loggerFn, &array);

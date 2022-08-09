@@ -6,7 +6,7 @@ import core.array;
 import core.buffer;
 import api.bindgen;
 #define wasm_import(name) __attribute__((import_name(name)))
-export {
+export  {
 enum class GPUTextureDimension {
 	_1D = 1,
 	_2D = 2,
@@ -127,7 +127,7 @@ enum class GPUTextureUsageFlags: u32 {
 	STORAGE_BINDING = 8,
 	RENDER_ATTACHMENT = 16,
 };
-inline GPUTextureUsageFlags operator |(GPUTextureUsageFlags l, GPUTextureUsageFlags r) { return (GPUTextureUsageFlags)((u32)l | (u32)r); }
+inline constexpr GPUTextureUsageFlags operator |(GPUTextureUsageFlags l, GPUTextureUsageFlags r) { return (GPUTextureUsageFlags)((u32)l | (u32)r); }
 struct GPUExtent3DDict {
 	u32 width;
 	u32 height{1};
@@ -186,37 +186,55 @@ public:
 };
 struct IGPUBuffer {
 private:
-	static wasm_import("cpp_destroy0") void cpp_destroy(u32);
+	static wasm_import("cpp_GPUBuffer_destroy0") void cpp_destroy(u32);
 public:
 	static inline constexpr char const* Name = "GPUBuffer";
 	u32 handle;
-	inline void Destroy() {
+	inline void Destroy() const {
 		IGPUBuffer::cpp_destroy(this->handle);
 	}
 };
 struct IGPUTexture {
 private:
-	static wasm_import("cpp_destroy0") void cpp_destroy(u32);
-	static wasm_import("cpp_createView0") void cpp_createView(u32, u32);
-	static wasm_import("cpp_createView1") void cpp_createView(u32, u32, u32);
+	static wasm_import("cpp_GPUTexture_destroy0") void cpp_destroy(u32);
+	static wasm_import("cpp_GPUTexture_createView0") void cpp_createView(u32, u32);
+	static wasm_import("cpp_GPUTexture_createView1") void cpp_createView(u32, GPUTextureViewDescriptor const*, u32);
+	static wasm_import("cpp_GPUTexture_format") void cpp_format(u32, GPUTextureFormat*);
+	static wasm_import("cpp_GPUTexture_width") void cpp_width(u32, u32*);
+	static wasm_import("cpp_GPUTexture_height") void cpp_height(u32, u32*);
 public:
 	static inline constexpr char const* Name = "GPUTexture";
 	u32 handle;
-	inline void Destroy() {
+	inline void Destroy() const {
 		IGPUTexture::cpp_destroy(this->handle);
 	}
-	inline LocalHandle<IGPUTextureView> CreateView(Scope* pScope) {
+	inline LocalHandle<IGPUTextureView> CreateView(Scope* pScope) const {
 		u32 const _retHandle = pScope->externrefScope.AcquireLocal();
 		IGPUTexture::cpp_createView(this->handle, _retHandle);
 		return LocalHandle<IGPUTextureView>{_retHandle};
 	}
-	inline LocalHandle<IGPUTextureView> CreateView(GPUTextureViewDescriptor const* pDescriptor, Scope* pScope) {
+	inline LocalHandle<IGPUTextureView> CreateView(GPUTextureViewDescriptor const* pDescriptor, Scope* pScope) const {
 		u32 const _retHandle = pScope->externrefScope.AcquireLocal();
-		IGPUTexture::cpp_createView(this->handle, (u32)pDescriptor, _retHandle);
+		IGPUTexture::cpp_createView(this->handle, pDescriptor, _retHandle);
 		return LocalHandle<IGPUTextureView>{_retHandle};
 	}
-	inline LocalHandle<IGPUTextureView> CreateView(GPUTextureViewDescriptor&& descriptor, Scope* pScope) {
+	inline LocalHandle<IGPUTextureView> CreateView(GPUTextureViewDescriptor&& descriptor, Scope* pScope) const {
 		return this->CreateView(&descriptor, pScope);
+	}
+	inline GPUTextureFormat Format() const {
+		GPUTextureFormat _ret{};
+		IGPUTexture::cpp_format(this->handle, &_ret);
+		return _ret;
+	}
+	inline u32 Width() const {
+		u32 _ret{};
+		IGPUTexture::cpp_width(this->handle, &_ret);
+		return _ret;
+	}
+	inline u32 Height() const {
+		u32 _ret{};
+		IGPUTexture::cpp_height(this->handle, &_ret);
+		return _ret;
 	}
 };
 struct GPURenderPassColorAttachment {
@@ -248,58 +266,58 @@ public:
 };
 struct IGPURenderPipeline {
 private:
-	static wasm_import("cpp_getBindGroupLayout1") void cpp_getBindGroupLayout(u32, u32, u32);
+	static wasm_import("cpp_GPURenderPipeline_getBindGroupLayout1") void cpp_getBindGroupLayout(u32, u32, u32);
 public:
 	static inline constexpr char const* Name = "GPURenderPipeline";
 	u32 handle;
-	inline LocalHandle<IGPUBindGroupLayout> GetBindGroupLayout(u32 index, Scope* pScope) {
+	inline LocalHandle<IGPUBindGroupLayout> GetBindGroupLayout(u32 index, Scope* pScope) const {
 		u32 const _retHandle = pScope->externrefScope.AcquireLocal();
-		IGPURenderPipeline::cpp_getBindGroupLayout(this->handle, (u32)index, _retHandle);
+		IGPURenderPipeline::cpp_getBindGroupLayout(this->handle, index, _retHandle);
 		return LocalHandle<IGPUBindGroupLayout>{_retHandle};
 	}
 };
 struct IGPURenderPassEncoder {
 private:
-	static wasm_import("cpp_end0") void cpp_end(u32);
-	static wasm_import("cpp_setPipeline1") void cpp_setPipeline(u32, u32);
-	static wasm_import("cpp_setBindGroup2") void cpp_setBindGroup(u32, u32, u32);
-	static wasm_import("cpp_setVertexBuffer4") void cpp_setVertexBuffer(u32, u32, u32, u32, u32);
-	static wasm_import("cpp_draw4") void cpp_draw(u32, u32, u32, u32, u32);
+	static wasm_import("cpp_GPURenderPassEncoder_end0") void cpp_end(u32);
+	static wasm_import("cpp_GPURenderPassEncoder_setPipeline1") void cpp_setPipeline(u32, u32);
+	static wasm_import("cpp_GPURenderPassEncoder_setBindGroup2") void cpp_setBindGroup(u32, u32, u32);
+	static wasm_import("cpp_GPURenderPassEncoder_setVertexBuffer4") void cpp_setVertexBuffer(u32, u32, u32, u32, u32);
+	static wasm_import("cpp_GPURenderPassEncoder_draw4") void cpp_draw(u32, u32, u32, u32, u32);
 public:
 	static inline constexpr char const* Name = "GPURenderPassEncoder";
 	u32 handle;
-	inline void End() {
+	inline void End() const {
 		IGPURenderPassEncoder::cpp_end(this->handle);
 	}
-	inline void SetPipeline(Handle<IGPURenderPipeline> pipeline) {
+	inline void SetPipeline(Handle<IGPURenderPipeline> pipeline) const {
 		IGPURenderPassEncoder::cpp_setPipeline(this->handle, pipeline->handle);
 	}
-	inline void SetBindGroup(u32 index, Handle<IGPUBindGroup> bindGroup) {
-		IGPURenderPassEncoder::cpp_setBindGroup(this->handle, (u32)index, bindGroup->handle);
+	inline void SetBindGroup(u32 index, Handle<IGPUBindGroup> bindGroup) const {
+		IGPURenderPassEncoder::cpp_setBindGroup(this->handle, index, bindGroup->handle);
 	}
-	inline void SetVertexBuffer(u32 slot, Handle<IGPUBuffer> buffer, u32 offset, u32 size) {
-		IGPURenderPassEncoder::cpp_setVertexBuffer(this->handle, (u32)slot, buffer->handle, (u32)offset, (u32)size);
+	inline void SetVertexBuffer(u32 slot, Handle<IGPUBuffer> buffer, u32 offset, u32 size) const {
+		IGPURenderPassEncoder::cpp_setVertexBuffer(this->handle, slot, buffer->handle, offset, size);
 	}
-	inline void Draw(u32 vertexCount, u32 instanceCount = 1, u32 firstVertex = 0, u32 firstInstance = 0) {
-		IGPURenderPassEncoder::cpp_draw(this->handle, (u32)vertexCount, (u32)instanceCount, (u32)firstVertex, (u32)firstInstance);
+	inline void Draw(u32 vertexCount, u32 instanceCount = 1, u32 firstVertex = 0, u32 firstInstance = 0) const {
+		IGPURenderPassEncoder::cpp_draw(this->handle, vertexCount, instanceCount, firstVertex, firstInstance);
 	}
 };
 struct IGPUCommandEncoder {
 private:
-	static wasm_import("cpp_beginRenderPass1") void cpp_beginRenderPass(u32, u32, u32);
-	static wasm_import("cpp_finish0") void cpp_finish(u32, u32);
+	static wasm_import("cpp_GPUCommandEncoder_beginRenderPass1") void cpp_beginRenderPass(u32, GPURenderPassDescriptor const*, u32);
+	static wasm_import("cpp_GPUCommandEncoder_finish0") void cpp_finish(u32, u32);
 public:
 	static inline constexpr char const* Name = "GPUCommandEncoder";
 	u32 handle;
-	inline LocalHandle<IGPURenderPassEncoder> BeginRenderPass(GPURenderPassDescriptor const* pDescriptor, Scope* pScope) {
+	inline LocalHandle<IGPURenderPassEncoder> BeginRenderPass(GPURenderPassDescriptor const* pDescriptor, Scope* pScope) const {
 		u32 const _retHandle = pScope->externrefScope.AcquireLocal();
-		IGPUCommandEncoder::cpp_beginRenderPass(this->handle, (u32)pDescriptor, _retHandle);
+		IGPUCommandEncoder::cpp_beginRenderPass(this->handle, pDescriptor, _retHandle);
 		return LocalHandle<IGPURenderPassEncoder>{_retHandle};
 	}
-	inline LocalHandle<IGPURenderPassEncoder> BeginRenderPass(GPURenderPassDescriptor&& descriptor, Scope* pScope) {
+	inline LocalHandle<IGPURenderPassEncoder> BeginRenderPass(GPURenderPassDescriptor&& descriptor, Scope* pScope) const {
 		return this->BeginRenderPass(&descriptor, pScope);
 	}
-	inline LocalHandle<IGPUCommandBuffer> Finish(Scope* pScope) {
+	inline LocalHandle<IGPUCommandBuffer> Finish(Scope* pScope) const {
 		u32 const _retHandle = pScope->externrefScope.AcquireLocal();
 		IGPUCommandEncoder::cpp_finish(this->handle, _retHandle);
 		return LocalHandle<IGPUCommandBuffer>{_retHandle};
@@ -324,54 +342,54 @@ struct GPUImageDataLayout {
 struct WriteBufferParamStruct {
 	Handle<IGPUBuffer> buffer;
 	u32 bufferOffset;
-	Array<u8> data;
+	Memory<u8> data;
 	u32 dataOffset;
 	u32 size;
 };
 struct WriteTextureParamStruct {
 	GPUImageCopyTexture destination;
-	Array<u8> data;
+	Memory<u8> data;
 	GPUImageDataLayout dataLayout;
 	GPUExtent3DDict size;
 };
 struct IGPUQueue {
 private:
-	static wasm_import("cpp_submit1") void cpp_submit(u32, u32);
-	static wasm_import("cpp_writeBuffer5") void cpp_writeBuffer(u32, u32, u32, u32, u32, u32);
-	static wasm_import("cpp_writeBuffer1") void cpp_writeBuffer(u32, u32);
-	static wasm_import("cpp_writeTexture4") void cpp_writeTexture(u32, u32, u32, u32, u32);
-	static wasm_import("cpp_writeTexture1") void cpp_writeTexture(u32, u32);
+	static wasm_import("cpp_GPUQueue_submit1") void cpp_submit(u32, Array<Handle<IGPUCommandBuffer>, Borrow> const*);
+	static wasm_import("cpp_GPUQueue_writeBuffer5") void cpp_writeBuffer(u32, u32, u32, Memory<u8> const*, u32, u32);
+	static wasm_import("cpp_GPUQueue_writeBuffer1") void cpp_writeBuffer(u32, WriteBufferParamStruct const*);
+	static wasm_import("cpp_GPUQueue_writeTexture4") void cpp_writeTexture(u32, GPUImageCopyTexture const*, Memory<u8> const*, GPUImageDataLayout const*, GPUExtent3DDict const*);
+	static wasm_import("cpp_GPUQueue_writeTexture1") void cpp_writeTexture(u32, WriteTextureParamStruct const*);
 public:
 	static inline constexpr char const* Name = "GPUQueue";
 	u32 handle;
-	inline void Submit(Array<Handle<IGPUCommandBuffer>, Borrow> const* pCommandBuffers) {
-		IGPUQueue::cpp_submit(this->handle, (u32)pCommandBuffers);
+	inline void Submit(Array<Handle<IGPUCommandBuffer>, Borrow> const* pCommandBuffers) const {
+		IGPUQueue::cpp_submit(this->handle, pCommandBuffers);
 	}
-	inline void Submit(Array<Handle<IGPUCommandBuffer>, Borrow>&& commandBuffers) {
+	inline void Submit(Array<Handle<IGPUCommandBuffer>, Borrow>&& commandBuffers) const {
 		this->Submit(&commandBuffers);
 	}
-	inline void WriteBuffer(Handle<IGPUBuffer> buffer, u32 bufferOffset, Array<u8> const* pData, u32 dataOffset, u32 size) {
-		IGPUQueue::cpp_writeBuffer(this->handle, buffer->handle, (u32)bufferOffset, (u32)pData, (u32)dataOffset, (u32)size);
+	inline void WriteBuffer(Handle<IGPUBuffer> buffer, u32 bufferOffset, Memory<u8> const* pData, u32 dataOffset, u32 size) const {
+		IGPUQueue::cpp_writeBuffer(this->handle, buffer->handle, bufferOffset, pData, dataOffset, size);
 	}
-	inline void WriteBuffer(Handle<IGPUBuffer> buffer, u32 bufferOffset, Array<u8>&& data, u32 dataOffset, u32 size) {
+	inline void WriteBuffer(Handle<IGPUBuffer> buffer, u32 bufferOffset, Memory<u8>&& data, u32 dataOffset, u32 size) const {
 		this->WriteBuffer(buffer, bufferOffset, &data, dataOffset, size);
 	}
-	inline void WriteBuffer(WriteBufferParamStruct const* pParams) {
-		IGPUQueue::cpp_writeBuffer(this->handle, (u32)pParams);
+	inline void WriteBuffer(WriteBufferParamStruct const* pParams) const {
+		IGPUQueue::cpp_writeBuffer(this->handle, pParams);
 	}
-	inline void WriteBuffer(WriteBufferParamStruct&& params) {
+	inline void WriteBuffer(WriteBufferParamStruct&& params) const {
 		this->WriteBuffer(&params);
 	}
-	inline void WriteTexture(GPUImageCopyTexture const* pDestination, Array<u8> const* pData, GPUImageDataLayout const* pDataLayout, GPUExtent3DDict const* pSize) {
-		IGPUQueue::cpp_writeTexture(this->handle, (u32)pDestination, (u32)pData, (u32)pDataLayout, (u32)pSize);
+	inline void WriteTexture(GPUImageCopyTexture const* pDestination, Memory<u8> const* pData, GPUImageDataLayout const* pDataLayout, GPUExtent3DDict const* pSize) const {
+		IGPUQueue::cpp_writeTexture(this->handle, pDestination, pData, pDataLayout, pSize);
 	}
-	inline void WriteTexture(GPUImageCopyTexture&& destination, Array<u8>&& data, GPUImageDataLayout&& dataLayout, GPUExtent3DDict&& size) {
+	inline void WriteTexture(GPUImageCopyTexture&& destination, Memory<u8>&& data, GPUImageDataLayout&& dataLayout, GPUExtent3DDict&& size) const {
 		this->WriteTexture(&destination, &data, &dataLayout, &size);
 	}
-	inline void WriteTexture(WriteTextureParamStruct const* pParams) {
-		IGPUQueue::cpp_writeTexture(this->handle, (u32)pParams);
+	inline void WriteTexture(WriteTextureParamStruct const* pParams) const {
+		IGPUQueue::cpp_writeTexture(this->handle, pParams);
 	}
-	inline void WriteTexture(WriteTextureParamStruct&& params) {
+	inline void WriteTexture(WriteTextureParamStruct&& params) const {
 		this->WriteTexture(&params);
 	}
 };
@@ -476,7 +494,7 @@ enum class GPUColorWrite: u32 {
 	ALPHA = 8,
 	ALL = 15,
 };
-inline GPUColorWrite operator |(GPUColorWrite l, GPUColorWrite r) { return (GPUColorWrite)((u32)l | (u32)r); }
+inline constexpr GPUColorWrite operator |(GPUColorWrite l, GPUColorWrite r) { return (GPUColorWrite)((u32)l | (u32)r); }
 enum class GPUBufferUsageFlags: u32 {
 	MAP_READ = 1,
 	MAP_WRITE = 2,
@@ -489,7 +507,7 @@ enum class GPUBufferUsageFlags: u32 {
 	INDIRECT = 256,
 	QUERY_RESOLVE = 512,
 };
-inline GPUBufferUsageFlags operator |(GPUBufferUsageFlags l, GPUBufferUsageFlags r) { return (GPUBufferUsageFlags)((u32)l | (u32)r); }
+inline constexpr GPUBufferUsageFlags operator |(GPUBufferUsageFlags l, GPUBufferUsageFlags r) { return (GPUBufferUsageFlags)((u32)l | (u32)r); }
 enum class GPUAutoLayoutMode {
 	Auto = 1,
 };
@@ -624,7 +642,7 @@ enum class GPUShaderStageFlags: u32 {
 	FRAGMENT = 2,
 	COMPUTE = 4,
 };
-inline GPUShaderStageFlags operator |(GPUShaderStageFlags l, GPUShaderStageFlags r) { return (GPUShaderStageFlags)((u32)l | (u32)r); }
+inline constexpr GPUShaderStageFlags operator |(GPUShaderStageFlags l, GPUShaderStageFlags r) { return (GPUShaderStageFlags)((u32)l | (u32)r); }
 enum class GPUBufferBindingType {
 	Uniform = 1,
 	Storage = 2,
@@ -667,93 +685,93 @@ struct GPUBindGroupLayoutDescriptor {
 };
 struct IGPUDevice {
 private:
-	static wasm_import("cpp_destroy0") void cpp_destroy(u32);
-	static wasm_import("cpp_createCommandEncoder0") void cpp_createCommandEncoder(u32, u32);
-	static wasm_import("cpp_createTexture1") void cpp_createTexture(u32, u32, u32);
-	static wasm_import("cpp_createShaderModule1") void cpp_createShaderModule(u32, u32, u32);
-	static wasm_import("cpp_createPipelineLayout1") void cpp_createPipelineLayout(u32, u32, u32);
-	static wasm_import("cpp_createRenderPipeline1") void cpp_createRenderPipeline(u32, u32, u32);
-	static wasm_import("cpp_createBuffer1") void cpp_createBuffer(u32, u32, u32);
-	static wasm_import("cpp_createSampler1") void cpp_createSampler(u32, u32, u32);
-	static wasm_import("cpp_createBindGroup1") void cpp_createBindGroup(u32, u32, u32);
-	static wasm_import("cpp_createBindGroupLayout1") void cpp_createBindGroupLayout(u32, u32, u32);
-	static wasm_import("cpp_queue") void cpp_queue(u32, u32);
+	static wasm_import("cpp_GPUDevice_destroy0") void cpp_destroy(u32);
+	static wasm_import("cpp_GPUDevice_createCommandEncoder0") void cpp_createCommandEncoder(u32, u32);
+	static wasm_import("cpp_GPUDevice_createTexture1") void cpp_createTexture(u32, GPUTextureDescriptor const*, u32);
+	static wasm_import("cpp_GPUDevice_createShaderModule1") void cpp_createShaderModule(u32, GPUShaderModuleDescriptor const*, u32);
+	static wasm_import("cpp_GPUDevice_createPipelineLayout1") void cpp_createPipelineLayout(u32, GPUPipelineLayoutDescriptor const*, u32);
+	static wasm_import("cpp_GPUDevice_createRenderPipeline1") void cpp_createRenderPipeline(u32, GPURenderPipelineDescriptor const*, u32);
+	static wasm_import("cpp_GPUDevice_createBuffer1") void cpp_createBuffer(u32, GPUBufferDescriptor const*, u32);
+	static wasm_import("cpp_GPUDevice_createSampler1") void cpp_createSampler(u32, GPUSamplerDescriptor const*, u32);
+	static wasm_import("cpp_GPUDevice_createBindGroup1") void cpp_createBindGroup(u32, GPUBindGroupDescriptor const*, u32);
+	static wasm_import("cpp_GPUDevice_createBindGroupLayout1") void cpp_createBindGroupLayout(u32, GPUBindGroupLayoutDescriptor const*, u32);
+	static wasm_import("cpp_GPUDevice_queue") void cpp_queue(u32, u32);
 public:
 	static inline constexpr char const* Name = "GPUDevice";
 	u32 handle;
-	inline void Destroy() {
+	inline void Destroy() const {
 		IGPUDevice::cpp_destroy(this->handle);
 	}
-	inline LocalHandle<IGPUCommandEncoder> CreateCommandEncoder(Scope* pScope) {
+	inline LocalHandle<IGPUCommandEncoder> CreateCommandEncoder(Scope* pScope) const {
 		u32 const _retHandle = pScope->externrefScope.AcquireLocal();
 		IGPUDevice::cpp_createCommandEncoder(this->handle, _retHandle);
 		return LocalHandle<IGPUCommandEncoder>{_retHandle};
 	}
-	inline LocalHandle<IGPUTexture> CreateTexture(GPUTextureDescriptor const* pDescriptor, Scope* pScope) {
+	inline LocalHandle<IGPUTexture> CreateTexture(GPUTextureDescriptor const* pDescriptor, Scope* pScope) const {
 		u32 const _retHandle = pScope->externrefScope.AcquireLocal();
-		IGPUDevice::cpp_createTexture(this->handle, (u32)pDescriptor, _retHandle);
+		IGPUDevice::cpp_createTexture(this->handle, pDescriptor, _retHandle);
 		return LocalHandle<IGPUTexture>{_retHandle};
 	}
-	inline LocalHandle<IGPUTexture> CreateTexture(GPUTextureDescriptor&& descriptor, Scope* pScope) {
+	inline LocalHandle<IGPUTexture> CreateTexture(GPUTextureDescriptor&& descriptor, Scope* pScope) const {
 		return this->CreateTexture(&descriptor, pScope);
 	}
-	inline LocalHandle<IGPUShaderModule> CreateShaderModule(GPUShaderModuleDescriptor const* pDescriptor, Scope* pScope) {
+	inline LocalHandle<IGPUShaderModule> CreateShaderModule(GPUShaderModuleDescriptor const* pDescriptor, Scope* pScope) const {
 		u32 const _retHandle = pScope->externrefScope.AcquireLocal();
-		IGPUDevice::cpp_createShaderModule(this->handle, (u32)pDescriptor, _retHandle);
+		IGPUDevice::cpp_createShaderModule(this->handle, pDescriptor, _retHandle);
 		return LocalHandle<IGPUShaderModule>{_retHandle};
 	}
-	inline LocalHandle<IGPUShaderModule> CreateShaderModule(GPUShaderModuleDescriptor&& descriptor, Scope* pScope) {
+	inline LocalHandle<IGPUShaderModule> CreateShaderModule(GPUShaderModuleDescriptor&& descriptor, Scope* pScope) const {
 		return this->CreateShaderModule(&descriptor, pScope);
 	}
-	inline LocalHandle<IGPUPipelineLayout> CreatePipelineLayout(GPUPipelineLayoutDescriptor const* pDescriptor, Scope* pScope) {
+	inline LocalHandle<IGPUPipelineLayout> CreatePipelineLayout(GPUPipelineLayoutDescriptor const* pDescriptor, Scope* pScope) const {
 		u32 const _retHandle = pScope->externrefScope.AcquireLocal();
-		IGPUDevice::cpp_createPipelineLayout(this->handle, (u32)pDescriptor, _retHandle);
+		IGPUDevice::cpp_createPipelineLayout(this->handle, pDescriptor, _retHandle);
 		return LocalHandle<IGPUPipelineLayout>{_retHandle};
 	}
-	inline LocalHandle<IGPUPipelineLayout> CreatePipelineLayout(GPUPipelineLayoutDescriptor&& descriptor, Scope* pScope) {
+	inline LocalHandle<IGPUPipelineLayout> CreatePipelineLayout(GPUPipelineLayoutDescriptor&& descriptor, Scope* pScope) const {
 		return this->CreatePipelineLayout(&descriptor, pScope);
 	}
-	inline LocalHandle<IGPURenderPipeline> CreateRenderPipeline(GPURenderPipelineDescriptor const* pDescriptor, Scope* pScope) {
+	inline LocalHandle<IGPURenderPipeline> CreateRenderPipeline(GPURenderPipelineDescriptor const* pDescriptor, Scope* pScope) const {
 		u32 const _retHandle = pScope->externrefScope.AcquireLocal();
-		IGPUDevice::cpp_createRenderPipeline(this->handle, (u32)pDescriptor, _retHandle);
+		IGPUDevice::cpp_createRenderPipeline(this->handle, pDescriptor, _retHandle);
 		return LocalHandle<IGPURenderPipeline>{_retHandle};
 	}
-	inline LocalHandle<IGPURenderPipeline> CreateRenderPipeline(GPURenderPipelineDescriptor&& descriptor, Scope* pScope) {
+	inline LocalHandle<IGPURenderPipeline> CreateRenderPipeline(GPURenderPipelineDescriptor&& descriptor, Scope* pScope) const {
 		return this->CreateRenderPipeline(&descriptor, pScope);
 	}
-	inline LocalHandle<IGPUBuffer> CreateBuffer(GPUBufferDescriptor const* pDescriptor, Scope* pScope) {
+	inline LocalHandle<IGPUBuffer> CreateBuffer(GPUBufferDescriptor const* pDescriptor, Scope* pScope) const {
 		u32 const _retHandle = pScope->externrefScope.AcquireLocal();
-		IGPUDevice::cpp_createBuffer(this->handle, (u32)pDescriptor, _retHandle);
+		IGPUDevice::cpp_createBuffer(this->handle, pDescriptor, _retHandle);
 		return LocalHandle<IGPUBuffer>{_retHandle};
 	}
-	inline LocalHandle<IGPUBuffer> CreateBuffer(GPUBufferDescriptor&& descriptor, Scope* pScope) {
+	inline LocalHandle<IGPUBuffer> CreateBuffer(GPUBufferDescriptor&& descriptor, Scope* pScope) const {
 		return this->CreateBuffer(&descriptor, pScope);
 	}
-	inline LocalHandle<IGPUSampler> CreateSampler(GPUSamplerDescriptor const* pDescriptor, Scope* pScope) {
+	inline LocalHandle<IGPUSampler> CreateSampler(GPUSamplerDescriptor const* pDescriptor, Scope* pScope) const {
 		u32 const _retHandle = pScope->externrefScope.AcquireLocal();
-		IGPUDevice::cpp_createSampler(this->handle, (u32)pDescriptor, _retHandle);
+		IGPUDevice::cpp_createSampler(this->handle, pDescriptor, _retHandle);
 		return LocalHandle<IGPUSampler>{_retHandle};
 	}
-	inline LocalHandle<IGPUSampler> CreateSampler(GPUSamplerDescriptor&& descriptor, Scope* pScope) {
+	inline LocalHandle<IGPUSampler> CreateSampler(GPUSamplerDescriptor&& descriptor, Scope* pScope) const {
 		return this->CreateSampler(&descriptor, pScope);
 	}
-	inline LocalHandle<IGPUBindGroup> CreateBindGroup(GPUBindGroupDescriptor const* pDescriptor, Scope* pScope) {
+	inline LocalHandle<IGPUBindGroup> CreateBindGroup(GPUBindGroupDescriptor const* pDescriptor, Scope* pScope) const {
 		u32 const _retHandle = pScope->externrefScope.AcquireLocal();
-		IGPUDevice::cpp_createBindGroup(this->handle, (u32)pDescriptor, _retHandle);
+		IGPUDevice::cpp_createBindGroup(this->handle, pDescriptor, _retHandle);
 		return LocalHandle<IGPUBindGroup>{_retHandle};
 	}
-	inline LocalHandle<IGPUBindGroup> CreateBindGroup(GPUBindGroupDescriptor&& descriptor, Scope* pScope) {
+	inline LocalHandle<IGPUBindGroup> CreateBindGroup(GPUBindGroupDescriptor&& descriptor, Scope* pScope) const {
 		return this->CreateBindGroup(&descriptor, pScope);
 	}
-	inline LocalHandle<IGPUBindGroupLayout> CreateBindGroupLayout(GPUBindGroupLayoutDescriptor const* pDescriptor, Scope* pScope) {
+	inline LocalHandle<IGPUBindGroupLayout> CreateBindGroupLayout(GPUBindGroupLayoutDescriptor const* pDescriptor, Scope* pScope) const {
 		u32 const _retHandle = pScope->externrefScope.AcquireLocal();
-		IGPUDevice::cpp_createBindGroupLayout(this->handle, (u32)pDescriptor, _retHandle);
+		IGPUDevice::cpp_createBindGroupLayout(this->handle, pDescriptor, _retHandle);
 		return LocalHandle<IGPUBindGroupLayout>{_retHandle};
 	}
-	inline LocalHandle<IGPUBindGroupLayout> CreateBindGroupLayout(GPUBindGroupLayoutDescriptor&& descriptor, Scope* pScope) {
+	inline LocalHandle<IGPUBindGroupLayout> CreateBindGroupLayout(GPUBindGroupLayoutDescriptor&& descriptor, Scope* pScope) const {
 		return this->CreateBindGroupLayout(&descriptor, pScope);
 	}
-	inline LocalHandle<IGPUQueue> Queue(Scope* pScope) {
+	inline LocalHandle<IGPUQueue> Queue(Scope* pScope) const {
 		u32 const _retHandle = pScope->externrefScope.AcquireLocal();
 		IGPUDevice::cpp_queue(this->handle, _retHandle);
 		return LocalHandle<IGPUQueue>{_retHandle};
@@ -767,21 +785,33 @@ struct GPUCanvasConfiguration {
 };
 struct IGPUCanvasContext {
 private:
-	static wasm_import("cpp_configure1") void cpp_configure(u32, u32);
-	static wasm_import("cpp_getCurrentTexture0") void cpp_getCurrentTexture(u32, u32);
+	static wasm_import("cpp_GPUCanvasContext_configure1") void cpp_configure(u32, GPUCanvasConfiguration const*);
+	static wasm_import("cpp_GPUCanvasContext_getCurrentTexture0") void cpp_getCurrentTexture(u32, u32);
 public:
 	static inline constexpr char const* Name = "GPUCanvasContext";
 	u32 handle;
-	inline void Configure(GPUCanvasConfiguration const* pConfiguration) {
-		IGPUCanvasContext::cpp_configure(this->handle, (u32)pConfiguration);
+	inline void Configure(GPUCanvasConfiguration const* pConfiguration) const {
+		IGPUCanvasContext::cpp_configure(this->handle, pConfiguration);
 	}
-	inline void Configure(GPUCanvasConfiguration&& configuration) {
+	inline void Configure(GPUCanvasConfiguration&& configuration) const {
 		this->Configure(&configuration);
 	}
-	inline LocalHandle<IGPUTexture> GetCurrentTexture(Scope* pScope) {
+	inline LocalHandle<IGPUTexture> GetCurrentTexture(Scope* pScope) const {
 		u32 const _retHandle = pScope->externrefScope.AcquireLocal();
 		IGPUCanvasContext::cpp_getCurrentTexture(this->handle, _retHandle);
 		return LocalHandle<IGPUTexture>{_retHandle};
+	}
+};
+struct IGPU {
+private:
+	static wasm_import("cpp_GPU_getPreferredCanvasFormat0") void cpp_getPreferredCanvasFormat(u32, GPUTextureFormat*);
+public:
+	static inline constexpr char const* Name = "GPU";
+	u32 handle;
+	inline GPUTextureFormat GetPreferredCanvasFormat() const {
+		GPUTextureFormat _ret{};
+		IGPU::cpp_getPreferredCanvasFormat(this->handle, &_ret);
+		return _ret;
 	}
 };
 }

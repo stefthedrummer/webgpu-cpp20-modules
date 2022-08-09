@@ -9,7 +9,7 @@ export class RecordType<V> extends Type<Record<string, V>> {
         public readonly allocator: Allocator) {
 
         super({
-            sizeOf: ArrayType.sizeOf_header + size_t,
+            sizeOf: ArrayType.t_Array_sizeof,
             alignOf: size_t,
             kind: Kind.ValueType,
             cppName: `Array<RecordEntry<${valType.cppName}>${allocator ? `, ${allocator}` : ""}>`,

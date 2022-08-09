@@ -25,9 +25,10 @@ export class Engine {
     static externref_table: WebAssembly.Table = null!;
     static jsonTypes: Record<string, { sizeOf: number, encode: (ptr: number, val: any) => void }> = {};
     static uiEventQueue: UIEvent[] = [];
+    static hGPU: number;
     static hDevice: number;
     static hCanvasContext: number;
-    static canvas : HTMLCanvasElement = null!;
+    static canvas: HTMLCanvasElement = null!;
 
     static bootstrap() {
 
@@ -110,12 +111,53 @@ export class Engine {
         Engine.uiEventQueue.push({
             type: UIEventType.CanvasResize,
             x: w,
-            y: h
+            y: h,
+            button: 0
         });
     }
 
     static registerUIEventListeners(canvas: HTMLCanvasElement) {
         window.onresize = e => Engine.fireResizeEvent();
+
+        canvas.addEventListener("wheel", e => {
+            e.preventDefault();
+            e.stopPropagation();
+            Engine.uiEventQueue.push({
+                type: UIEventType.MouseWheel,
+                x: e.deltaX,
+                y: e.deltaY,
+                button: 1,
+            });
+        }, { passive: false });
+
+        canvas.addEventListener("mousemove", e => {
+            Engine.uiEventQueue.push({
+                type: UIEventType.MouseMove,
+                x: e.clientX,
+                y: e.clientY,
+                button: 0,
+            });
+        });
+
+        canvas.addEventListener("mousedown", e => {
+            canvas.setPointerCapture(1);
+            Engine.uiEventQueue.push({
+                type: UIEventType.MouseDown,
+                x: e.clientX,
+                y: e.clientY,
+                button: e.button,
+            });
+        });
+
+        canvas.addEventListener("mouseup", e => {
+            canvas.releasePointerCapture(1);
+            Engine.uiEventQueue.push({
+                type: UIEventType.MouseUp,
+                x: e.clientX,
+                y: e.clientY,
+                button: e.button,
+            });
+        });
     }
 
     static run(adapter: GPUAdapter, device: GPUDevice, wasmModule: WebAssembly.WebAssemblyInstantiatedSource, canvas: HTMLCanvasElement) {
@@ -127,6 +169,8 @@ export class Engine {
         }
 
         {
+            Engine.externref_table.set(
+                Engine.hGPU = Engine.wasmModuleExports.cpp_acquirePersistent(), navigator.gpu!);
             Engine.externref_table.set(
                 Engine.hDevice = Engine.wasmModuleExports.cpp_acquirePersistent(), device);
             Engine.externref_table.set(
@@ -146,6 +190,7 @@ export class Engine {
         Engine.externref_table = Engine.wasmModuleExports.externref_table;
     }
 
+    static cpp_getGPU() { return Engine.hGPU; }
     static cpp_getDevice() { return Engine.hDevice; }
     static cpp_getCanvasContext() { return Engine.hCanvasContext; }
 
@@ -154,7 +199,6 @@ export class Engine {
     }
 
     static cpp_loadResources(pResourceDescriptors: number, fnCallback: number) {
-
         const resourceDesciptors = cpp_decode_Array(pResourceDescriptors, size_t,
             ptr => cpp_decode_ResourceDescriptor(Engine.mem_u32[ptr >> 2]));
 

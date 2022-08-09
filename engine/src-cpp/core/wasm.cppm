@@ -7,6 +7,7 @@ module;
 #define wasm_builtin extern "C"
 
 using u32 = unsigned long;
+using u16 = unsigned short;
 using i32 = signed long;
 using size_t = __SIZE_TYPE__;
 

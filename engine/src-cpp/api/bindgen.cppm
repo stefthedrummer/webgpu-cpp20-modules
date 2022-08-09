@@ -22,14 +22,16 @@ concept CompatibleHandle = InterfaceCompatibilityTable<typename FromHandle::Type
 
 struct ExternRefState {
 
-    u32 const externrefSize = externref_size();
+    u32 const externrefSize;
+    u32 const halfExternrefSize;
 
     u32 stackPointer{};
     u32* freePersistentHandleSlots{};
     u32 freePersistentHandlePointer{};
 
-    ExternRefState() {
-        u32 const halfExternrefSize = externrefSize / 2;
+    ExternRefState() :
+        externrefSize{externref_size()},
+        halfExternrefSize{externref_size() / 2} {
 
         stackPointer = halfExternrefSize - 1;
 
@@ -42,10 +44,17 @@ struct ExternRefState {
         }
     }
 
+    u32 PersistentHandleCount() {
+        return freePersistentHandlePointer;
+    }
+
     u32 AcquirePersistent() {
-        if (freePersistentHandlePointer >= externrefSize) {
-            Console::Panic("Out of persistent-handle space");
+        if constexpr(DEBUG) {
+            if (freePersistentHandlePointer >= halfExternrefSize) {
+                Console::Panic("Out of persistent-handle space");
+            }
         }
+        
         u32 slot = freePersistentHandleSlots[freePersistentHandlePointer];
         freePersistentHandleSlots[freePersistentHandlePointer] = 0;
         freePersistentHandlePointer++;
@@ -53,11 +62,11 @@ struct ExternRefState {
     }
 
     void ReleasePersistent(u32 slot) {
-#if DEBUG
-        if (freePersistentHandleSlots[slot] != 0) {
-            Console::Panic("ReleasePersistent on non-acquired slot");
+        if constexpr(DEBUG) {
+            if (freePersistentHandleSlots[slot] != 0) {
+                Console::Panic("ReleasePersistent on non-acquired slot");
+            }
         }
-#endif
         externref_clear(slot);
         freePersistentHandleSlots[--freePersistentHandlePointer] = slot;
     }
@@ -66,18 +75,24 @@ struct ExternRefState {
 struct VirtualStackState {
     u8* stackBegin;
     u8* stackPointer;
+    u8* stackEnd;
 
     VirtualStackState(u32 virtualStackSize) {
         stackBegin = (u8*)malloc(virtualStackSize);
         stackPointer = stackBegin;
+        stackEnd = stackBegin + virtualStackSize;
     }
 };
 
 ExternRefState g_externrefState{};
-VirtualStackState g_virtualStackState{1024 * 4};
+VirtualStackState g_virtualStackState{1024 * 1024 * 1};
 
 wasm_export("cpp_acquirePersistent") u32 cpp_acquirePersistent() {
     return g_externrefState.AcquirePersistent();
+}
+
+export u32 PersistentHandleCount() {
+    return g_externrefState.PersistentHandleCount();
 }
 
 export template<typename T>
@@ -90,6 +105,7 @@ struct Handle {
     using Type_T = T;
     u32 handle;
 
+    Handle() : handle{} {};
     Handle(u32 handle) : handle{ handle } {};
 
     template<CompatibleHandle<T> H>
@@ -101,7 +117,7 @@ struct Handle {
         return *this;
     }
 
-    T* operator ->() {
+    T* operator ->() const {
         return (T*)this;
     }
 };
@@ -111,13 +127,21 @@ struct PersistentHandle {
     using Type_T = T;
     u32 handle;
 
-    T* operator ->() { return (T*)this; }
+    T* operator ->() const { return (T*)this; }
     operator Handle<T>() { return Handle<T>{ handle }; }
     Handle<T> operator ~() { return Handle<T>{ handle }; }
 
     void Release() {
         g_externrefState.ReleasePersistent(handle);
         handle = 0;
+    }
+
+    static PersistentHandle<T> Allocate() {
+        return { g_externrefState.AcquirePersistent() };
+    }
+
+    void Set(Handle<T> handle) {
+        externref_copy(this->handle, handle.handle);
     }
 };
 
@@ -126,12 +150,13 @@ struct LocalHandle {
     using Type_T = T;
     u32 handle;
 
-    T* operator ->() { return (T*)this; }
+    T* operator ->() const { return (T*)this; }
     operator Handle<T>() { return Handle<T>{ handle }; }
     Handle<T> operator ~() { return Handle<T>{ handle }; }
     PersistentHandle<T> operator !() { return Persistent(); }
 
     PersistentHandle<T> Persistent() {
+        //Console::Log(T::Name);
         u32 persistentHandle{ g_externrefState.AcquirePersistent() };
         externref_copy(persistentHandle, handle);
         return PersistentHandle<T>{ persistentHandle };
@@ -147,7 +172,7 @@ struct RecordEntry {
 
 export template<typename T>
 struct Optional {
-    bool const isPresent;
+    bool isPresent;
     T val;
 
     constexpr Optional() :
@@ -158,11 +183,21 @@ struct Optional {
         isPresent{ true },
         val{ val } {
     }
+
+    constexpr Optional(T& val) :
+        isPresent{ true },
+        val{ val } {
+    }
+
+    constexpr Optional(T const& val) :
+        isPresent{ true },
+        val{ val } {
+    }
 };
 
 export struct Scope {
     template<typename T, Allocator TAllocator, template<typename...> typename TTemplate, typename... Tn>
-    using Base = Borrowed<T, TAllocator, TTemplate, Tn...>;
+    using TBase = Owned<T, TAllocator, TTemplate, Tn...>;
 
     struct ExternRefScope {
         u32 capacity;
@@ -184,11 +219,11 @@ export struct Scope {
         }
 
         inline u32 AcquireLocal() {
-#if DEBUG
-            if (stackPointer <= stackFrame - capacity) {
-                Console::Error(ErrorCode::HandleStackOverflow);
+            if constexpr (DEBUG) {
+                if (stackPointer <= stackFrame - capacity) {
+                    Console::Panic(ErrorCode::HandleStackOverflow);
+                }
             }
-#endif
             return stackPointer--;
         }
     };
@@ -206,6 +241,11 @@ export struct Scope {
         }
 
         void* Alloc(u32 size) {
+            if constexpr (DEBUG) {
+                if (g_virtualStackState.stackEnd < g_virtualStackState.stackPointer + size) {
+                    Console::Panic(ErrorCode::VirtualStackStackOverflow);
+                }
+            }
             void* ptr = g_virtualStackState.stackPointer;
             g_virtualStackState.stackPointer += size;
             return ptr;
@@ -218,7 +258,7 @@ export struct Scope {
     Scope(Scope const&) = delete;
     Scope(Scope&&) = delete;
 
-    Scope(u32 externRefCapacity) : externrefScope{ externRefCapacity } {}
+    Scope(u32 externRefCapacity = 0) : externrefScope{ externRefCapacity } {}
 
     struct Handle {
         friend class Scope;
@@ -233,7 +273,12 @@ export struct Scope {
 
     template<typename T>
     Array<T, Scope> operator[](std::initializer_list<T> init) {
-        return Array<T, Scope>{init, Handle{ this }};
+        return Array<T, Scope>::From(init, Handle{ this });
+    }
+
+    template<typename T>
+    Array<T, Scope> CreateArray(u32 length) {
+        return Array<T, Scope>{length, Handle{ this }};
     }
 };
 static_assert(Allocator<Scope>);

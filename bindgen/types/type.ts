@@ -80,7 +80,7 @@ export abstract class Type<T> extends Item {
     cppArg(arg: string): string { return `${arg}`; };
     cppParam(param: string): string { return `${this.cppName} ${param}`; };
     jsParam(param: string): string { return `${param}: ${this.tsName}`; };
-    cppCast2interop(val: string): string { return `(${this.cppInteropName})${val}`; }
+    cppCast2interop(val: string): string { return (this.cppInteropName == this.cppName) ? val : `(${this.cppInteropName})${val}`; }
 
     generateCpp(srcCpp: string[]): void { }
     generateTs(srcTs: string[]): void { }

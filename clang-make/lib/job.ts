@@ -1,6 +1,6 @@
 import { spawn } from "child_process";
 import { Artifact, ArtifactId, BuildableArtifact, Ctx, SourceCodeArtifact, TaskBuilder } from "./artifact";
-import { Colors, log, logArtifact, logExecution } from "./logging";
+import { Colors, log, logArtifact, logDiagnostics, logExecution } from "./logging";
 
 export enum JobResult {
     None = 0,
@@ -123,12 +123,12 @@ export class BuildJob<A extends BuildableArtifact> extends Job<A> implements Tas
                 const err = proc.stderr.read();
                 if (code == 0) {
                     if (err)
-                        log(console.log, Colors.warning, err.toString())
+                        logDiagnostics(console.log, Colors.warning, Colors.note, err.toString())
                     resolveTask(JobResult.None);
                 } else {
                     logArtifact(console.error, this.artifact.artifactId, Colors.info, `Execution was: ${program} ${args.join(" ")}`);
                     if (err)
-                        log(console.error, Colors.error, err.toString());
+                        logDiagnostics(console.error, Colors.error, Colors.note, err.toString());
                     resolveTask(JobResult.HasErrors);
                 }
             });

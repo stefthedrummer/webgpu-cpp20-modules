@@ -1,20 +1,20 @@
 import { Engine } from "./engine";
-import { cpp_decode_optional, cpp_decode_Array, cpp_decode_String, cpp_decode_Record, cpp_decode_BufferSource, size_t, cpp_encode_Array_Borrow, cpp_encode_Array_Heap } from "./bindgen-api";
-const cpp_enum_GPUTextureDimension: GPUTextureDimension[] = [
+import { cpp_decode_optional, cpp_decode_Array, cpp_decode_String, cpp_decode_Record, cpp_decode_BufferSource, size_t, cpp_encode_Array_Borrow, cpp_encode_Array_Heap, cpp_enum_literals, cpp_enum_define_literals } from "./bindgen-api";
+const cpp_enum_GPUTextureDimension = cpp_enum_define_literals<GPUTextureDimension>(
 	undefined!, "1d", "2d", "3d"
-];
-const cpp_enum_GPUTextureFormat: GPUTextureFormat[] = [
+);
+const cpp_enum_GPUTextureFormat = cpp_enum_define_literals<GPUTextureFormat>(
 	undefined!, "r8unorm", "r8snorm", "r8uint", "r8sint", "r16uint", "r16sint", "r16float", "rg8unorm", "rg8snorm", "rg8uint", "rg8sint", "r32uint", "r32sint", "r32float", "rg16uint", "rg16sint", "rg16float", "rgba8unorm", "rgba8unorm-srgb", "rgba8snorm", "rgba8uint", "rgba8sint", "bgra8unorm", "bgra8unorm-srgb", "rgb9e5ufloat", "rgb10a2unorm", "rg11b10ufloat", "rg32uint", "rg32sint", "rg32float", "rgba16uint", "rgba16sint", "rgba16float", "rgba32uint", "rgba32sint", "rgba32float", "stencil8", "depth16unorm", "depth24plus", "depth24plus-stencil8", "depth32float", "depth32float-stencil8", "bc1-rgba-unorm", "bc1-rgba-unorm-srgb", "bc2-rgba-unorm", "bc2-rgba-unorm-srgb", "bc3-rgba-unorm", "bc3-rgba-unorm-srgb", "bc4-r-unorm", "bc4-r-snorm", "bc5-rg-unorm", "bc5-rg-snorm", "bc6h-rgb-ufloat", "bc6h-rgb-float", "bc7-rgba-unorm", "bc7-rgba-unorm-srgb", "etc2-rgb8unorm", "etc2-rgb8unorm-srgb", "etc2-rgb8a1unorm", "etc2-rgb8a1unorm-srgb", "etc2-rgba8unorm", "etc2-rgba8unorm-srgb", "eac-r11unorm", "eac-r11snorm", "eac-rg11unorm", "eac-rg11snorm", "astc-4x4-unorm", "astc-4x4-unorm-srgb", "astc-5x4-unorm", "astc-5x4-unorm-srgb", "astc-5x5-unorm", "astc-5x5-unorm-srgb", "astc-6x5-unorm", "astc-6x5-unorm-srgb", "astc-6x6-unorm", "astc-6x6-unorm-srgb", "astc-8x5-unorm", "astc-8x5-unorm-srgb", "astc-8x6-unorm", "astc-8x6-unorm-srgb", "astc-8x8-unorm", "astc-8x8-unorm-srgb", "astc-10x5-unorm", "astc-10x5-unorm-srgb", "astc-10x6-unorm", "astc-10x6-unorm-srgb", "astc-10x8-unorm", "astc-10x8-unorm-srgb", "astc-10x10-unorm", "astc-10x10-unorm-srgb", "astc-12x10-unorm", "astc-12x10-unorm-srgb", "astc-12x12-unorm", "astc-12x12-unorm-srgb"
-];
-const cpp_enum_GPULoadOp: GPULoadOp[] = [
+);
+const cpp_enum_GPULoadOp = cpp_enum_define_literals<GPULoadOp>(
 	undefined!, "load", "clear"
-];
-const cpp_enum_GPUStoreOp: GPUStoreOp[] = [
+);
+const cpp_enum_GPUStoreOp = cpp_enum_define_literals<GPUStoreOp>(
 	undefined!, "store", "discard"
-];
-const cpp_enum_GPUCanvasAlphaMode: GPUCanvasAlphaMode[] = [
+);
+const cpp_enum_GPUCanvasAlphaMode = cpp_enum_define_literals<GPUCanvasAlphaMode>(
 	undefined!, "opaque", "premultiplied"
-];
+);
 export const cpp_sizeof_GPUExtent3DDict = 12;
 export function cpp_decode_GPUExtent3DDict(ptr: number): GPUExtent3DDict {
 	return {
@@ -44,12 +44,12 @@ export function cpp_decode_GPUColor(ptr: number): GPUColor {
 		a: Engine.mem_f32[(ptr + 12) >> 2],
 	};
 };
-const cpp_enum_GPUTextureAspect: GPUTextureAspect[] = [
+const cpp_enum_GPUTextureAspect = cpp_enum_define_literals<GPUTextureAspect>(
 	undefined!, "all", "depth-only", "stencil-only"
-];
-const cpp_enum_GPUTextureViewDimension: GPUTextureViewDimension[] = [
+);
+const cpp_enum_GPUTextureViewDimension = cpp_enum_define_literals<GPUTextureViewDimension>(
 	undefined!, "1d", "2d", "2d-array", "cube", "cube-array", "3d"
-];
+);
 export const cpp_sizeof_GPUTextureViewDescriptor = 20;
 export function cpp_decode_GPUTextureViewDescriptor(ptr: number): GPUTextureViewDescriptor {
 	return {
@@ -65,26 +65,41 @@ export class cpp_GPUSampler {
 export class cpp_GPUCommandBuffer {
 };
 export class cpp_GPUBuffer {
-	static cpp_destroy0(_this: number): void {
+	static cpp_GPUBuffer_destroy0(_this: number): void {
 		const arg_this = Engine.externref_table.get(_this) as GPUBuffer;
 		arg_this.destroy();
 	}
 };
 export class cpp_GPUTexture {
-	static cpp_destroy0(_this: number): void {
+	static cpp_GPUTexture_destroy0(_this: number): void {
 		const arg_this = Engine.externref_table.get(_this) as GPUTexture;
 		arg_this.destroy();
 	}
-	static cpp_createView0(_this: number, _retHandle: number): void {
+	static cpp_GPUTexture_createView0(_this: number, _retHandle: number): void {
 		const arg_this = Engine.externref_table.get(_this) as GPUTexture;
 		const ret = arg_this.createView();
 		Engine.externref_table.set(_retHandle, ret);
 	}
-	static cpp_createView1(_this: number, descriptor: number, _retHandle: number): void {
+	static cpp_GPUTexture_createView1(_this: number, descriptor: number, _retHandle: number): void {
 		const arg_this = Engine.externref_table.get(_this) as GPUTexture;
 		const arg_descriptor = cpp_decode_GPUTextureViewDescriptor(descriptor);
 		const ret = arg_this.createView(arg_descriptor);
 		Engine.externref_table.set(_retHandle, ret);
+	}
+	static cpp_GPUTexture_format(_this: number, _ret: number): void {
+		const arg_this = Engine.externref_table.get(_this) as GPUTexture;
+		const ret = arg_this.format;
+		Engine.mem_u32[(_ret) >> 2] = cpp_enum_GPUTextureFormat.lookup.get(ret) || 0;
+	}
+	static cpp_GPUTexture_width(_this: number, _ret: number): void {
+		const arg_this = Engine.externref_table.get(_this) as GPUTexture;
+		const ret = arg_this.width;
+		Engine.mem_u32[(_ret) >> 2] = ret;
+	}
+	static cpp_GPUTexture_height(_this: number, _ret: number): void {
+		const arg_this = Engine.externref_table.get(_this) as GPUTexture;
+		const ret = arg_this.height;
+		Engine.mem_u32[(_ret) >> 2] = ret;
 	}
 };
 export const cpp_sizeof_GPURenderPassColorAttachment = 28;
@@ -109,7 +124,7 @@ export class cpp_GPUBindGroupLayout {
 export class cpp_GPUPipelineLayout {
 };
 export class cpp_GPURenderPipeline {
-	static cpp_getBindGroupLayout1(_this: number, index: number, _retHandle: number): void {
+	static cpp_GPURenderPipeline_getBindGroupLayout1(_this: number, index: number, _retHandle: number): void {
 		const arg_this = Engine.externref_table.get(_this) as GPURenderPipeline;
 		const arg_index = index;
 		const ret = arg_this.getBindGroupLayout(arg_index);
@@ -117,22 +132,22 @@ export class cpp_GPURenderPipeline {
 	}
 };
 export class cpp_GPURenderPassEncoder {
-	static cpp_end0(_this: number): void {
+	static cpp_GPURenderPassEncoder_end0(_this: number): void {
 		const arg_this = Engine.externref_table.get(_this) as GPURenderPassEncoder;
 		arg_this.end();
 	}
-	static cpp_setPipeline1(_this: number, pipeline: number): void {
+	static cpp_GPURenderPassEncoder_setPipeline1(_this: number, pipeline: number): void {
 		const arg_this = Engine.externref_table.get(_this) as GPURenderPassEncoder;
 		const arg_pipeline = Engine.externref_table.get(pipeline) as GPURenderPipeline;
 		arg_this.setPipeline(arg_pipeline);
 	}
-	static cpp_setBindGroup2(_this: number, index: number, bindGroup: number): void {
+	static cpp_GPURenderPassEncoder_setBindGroup2(_this: number, index: number, bindGroup: number): void {
 		const arg_this = Engine.externref_table.get(_this) as GPURenderPassEncoder;
 		const arg_index = index;
 		const arg_bindGroup = Engine.externref_table.get(bindGroup) as GPUBindGroup;
 		arg_this.setBindGroup(arg_index, arg_bindGroup);
 	}
-	static cpp_setVertexBuffer4(_this: number, slot: number, buffer: number, offset: number, size: number): void {
+	static cpp_GPURenderPassEncoder_setVertexBuffer4(_this: number, slot: number, buffer: number, offset: number, size: number): void {
 		const arg_this = Engine.externref_table.get(_this) as GPURenderPassEncoder;
 		const arg_slot = slot;
 		const arg_buffer = Engine.externref_table.get(buffer) as GPUBuffer;
@@ -140,7 +155,7 @@ export class cpp_GPURenderPassEncoder {
 		const arg_size = size;
 		arg_this.setVertexBuffer(arg_slot, arg_buffer, arg_offset, arg_size);
 	}
-	static cpp_draw4(_this: number, vertexCount: number, instanceCount: number, firstVertex: number, firstInstance: number): void {
+	static cpp_GPURenderPassEncoder_draw4(_this: number, vertexCount: number, instanceCount: number, firstVertex: number, firstInstance: number): void {
 		const arg_this = Engine.externref_table.get(_this) as GPURenderPassEncoder;
 		const arg_vertexCount = vertexCount;
 		const arg_instanceCount = instanceCount;
@@ -150,13 +165,13 @@ export class cpp_GPURenderPassEncoder {
 	}
 };
 export class cpp_GPUCommandEncoder {
-	static cpp_beginRenderPass1(_this: number, descriptor: number, _retHandle: number): void {
+	static cpp_GPUCommandEncoder_beginRenderPass1(_this: number, descriptor: number, _retHandle: number): void {
 		const arg_this = Engine.externref_table.get(_this) as GPUCommandEncoder;
 		const arg_descriptor = cpp_decode_GPURenderPassDescriptor(descriptor);
 		const ret = arg_this.beginRenderPass(arg_descriptor);
 		Engine.externref_table.set(_retHandle, ret);
 	}
-	static cpp_finish0(_this: number, _retHandle: number): void {
+	static cpp_GPUCommandEncoder_finish0(_this: number, _retHandle: number): void {
 		const arg_this = Engine.externref_table.get(_this) as GPUCommandEncoder;
 		const ret = arg_this.finish();
 		Engine.externref_table.set(_retHandle, ret);
@@ -187,15 +202,15 @@ export function cpp_decode_GPUImageDataLayout(ptr: number): GPUImageDataLayout {
 		rowsPerImage: Engine.mem_u32[(ptr + 8) >> 2],
 	};
 };
-export const cpp_sizeof_WriteBufferParamStruct = 28;
-export const cpp_sizeof_WriteTextureParamStruct = 60;
+export const cpp_sizeof_WriteBufferParamStruct = 24;
+export const cpp_sizeof_WriteTextureParamStruct = 56;
 export class cpp_GPUQueue {
-	static cpp_submit1(_this: number, commandBuffers: number): void {
+	static cpp_GPUQueue_submit1(_this: number, commandBuffers: number): void {
 		const arg_this = Engine.externref_table.get(_this) as GPUQueue;
 		const arg_commandBuffers = cpp_decode_Array(commandBuffers, 4, (e_ptr) => Engine.externref_table.get(Engine.mem_u32[(e_ptr) >> 2]) as GPUCommandBuffer);
 		arg_this.submit(arg_commandBuffers);
 	}
-	static cpp_writeBuffer5(_this: number, buffer: number, bufferOffset: number, data: number, dataOffset: number, size: number): void {
+	static cpp_GPUQueue_writeBuffer5(_this: number, buffer: number, bufferOffset: number, data: number, dataOffset: number, size: number): void {
 		const arg_this = Engine.externref_table.get(_this) as GPUQueue;
 		const arg_buffer = Engine.externref_table.get(buffer) as GPUBuffer;
 		const arg_bufferOffset = bufferOffset;
@@ -204,16 +219,16 @@ export class cpp_GPUQueue {
 		const arg_size = size;
 		arg_this.writeBuffer(arg_buffer, arg_bufferOffset, arg_data, arg_dataOffset, arg_size);
 	}
-	static cpp_writeBuffer1(_this: number, params: number): void {
+	static cpp_GPUQueue_writeBuffer1(_this: number, params: number): void {
 		const arg_this = Engine.externref_table.get(_this) as GPUQueue;
 		const arg_buffer = Engine.externref_table.get(Engine.mem_u32[(params + 0) >> 2]) as GPUBuffer;
 		const arg_bufferOffset = Engine.mem_u32[(params + 4) >> 2];
 		const arg_data = cpp_decode_BufferSource(params + 8);
-		const arg_dataOffset = Engine.mem_u32[(params + 20) >> 2];
-		const arg_size = Engine.mem_u32[(params + 24) >> 2];
+		const arg_dataOffset = Engine.mem_u32[(params + 16) >> 2];
+		const arg_size = Engine.mem_u32[(params + 20) >> 2];
 		arg_this.writeBuffer(arg_buffer, arg_bufferOffset, arg_data, arg_dataOffset, arg_size);
 	}
-	static cpp_writeTexture4(_this: number, destination: number, data: number, dataLayout: number, size: number): void {
+	static cpp_GPUQueue_writeTexture4(_this: number, destination: number, data: number, dataLayout: number, size: number): void {
 		const arg_this = Engine.externref_table.get(_this) as GPUQueue;
 		const arg_destination = cpp_decode_GPUImageCopyTexture(destination);
 		const arg_data = cpp_decode_BufferSource(data);
@@ -221,47 +236,47 @@ export class cpp_GPUQueue {
 		const arg_size = cpp_decode_GPUExtent3DDict(size);
 		arg_this.writeTexture(arg_destination, arg_data, arg_dataLayout, arg_size);
 	}
-	static cpp_writeTexture1(_this: number, params: number): void {
+	static cpp_GPUQueue_writeTexture1(_this: number, params: number): void {
 		const arg_this = Engine.externref_table.get(_this) as GPUQueue;
 		const arg_destination = cpp_decode_GPUImageCopyTexture(params + 0);
 		const arg_data = cpp_decode_BufferSource(params + 24);
-		const arg_dataLayout = cpp_decode_GPUImageDataLayout(params + 36);
-		const arg_size = cpp_decode_GPUExtent3DDict(params + 48);
+		const arg_dataLayout = cpp_decode_GPUImageDataLayout(params + 32);
+		const arg_size = cpp_decode_GPUExtent3DDict(params + 44);
 		arg_this.writeTexture(arg_destination, arg_data, arg_dataLayout, arg_size);
 	}
 };
 export class cpp_GPUShaderModule {
 };
-const cpp_enum_GPUVertexStepMode: GPUVertexStepMode[] = [
+const cpp_enum_GPUVertexStepMode = cpp_enum_define_literals<GPUVertexStepMode>(
 	undefined!, "vertex", "instance"
-];
-const cpp_enum_GPUVertexFormat: GPUVertexFormat[] = [
+);
+const cpp_enum_GPUVertexFormat = cpp_enum_define_literals<GPUVertexFormat>(
 	undefined!, "uint8x2", "uint8x4", "sint8x2", "sint8x4", "unorm8x2", "unorm8x4", "snorm8x2", "snorm8x4", "uint16x2", "uint16x4", "sint16x2", "sint16x4", "unorm16x2", "unorm16x4", "snorm16x2", "snorm16x4", "float16x2", "float16x4", "float32", "float32x2", "float32x3", "float32x4", "uint32", "uint32x2", "uint32x3", "uint32x4", "sint32", "sint32x2", "sint32x3", "sint32x4"
-];
-const cpp_enum_GPUPrimitiveTopology: GPUPrimitiveTopology[] = [
+);
+const cpp_enum_GPUPrimitiveTopology = cpp_enum_define_literals<GPUPrimitiveTopology>(
 	undefined!, "point-list", "line-list", "line-strip", "triangle-list", "triangle-strip"
-];
-const cpp_enum_GPUIndexFormat: GPUIndexFormat[] = [
+);
+const cpp_enum_GPUIndexFormat = cpp_enum_define_literals<GPUIndexFormat>(
 	undefined!, "uint16", "uint32"
-];
-const cpp_enum_GPUFrontFace: GPUFrontFace[] = [
+);
+const cpp_enum_GPUFrontFace = cpp_enum_define_literals<GPUFrontFace>(
 	undefined!, "ccw", "cw"
-];
-const cpp_enum_GPUCullMode: GPUCullMode[] = [
+);
+const cpp_enum_GPUCullMode = cpp_enum_define_literals<GPUCullMode>(
 	undefined!, "none", "front", "back"
-];
-const cpp_enum_GPUCompareFunction: GPUCompareFunction[] = [
+);
+const cpp_enum_GPUCompareFunction = cpp_enum_define_literals<GPUCompareFunction>(
 	undefined!, "never", "less", "equal", "less-equal", "greater", "not-equal", "greater-equal", "always"
-];
-const cpp_enum_GPUBlendOperation: GPUBlendOperation[] = [
+);
+const cpp_enum_GPUBlendOperation = cpp_enum_define_literals<GPUBlendOperation>(
 	undefined!, "add", "subtract", "reverse-subtract", "min", "max"
-];
-const cpp_enum_GPUBlendFactor: GPUBlendFactor[] = [
+);
+const cpp_enum_GPUBlendFactor = cpp_enum_define_literals<GPUBlendFactor>(
 	undefined!, "zero", "one", "src", "one-minus-src", "src-alpha", "one-minus-src-alpha", "dst", "one-minus-dst", "dst-alpha", "one-minus-dst-alpha", "src-alpha-saturated", "constant", "one-minus-constant"
-];
-const cpp_enum_GPUAutoLayoutMode: GPUAutoLayoutMode[] = [
+);
+const cpp_enum_GPUAutoLayoutMode = cpp_enum_define_literals<GPUAutoLayoutMode>(
 	undefined!, "auto"
-];
+);
 export const cpp_sizeof_GPUBlendComponent = 12;
 export function cpp_decode_GPUBlendComponent(ptr: number): GPUBlendComponent {
 	return {
@@ -388,12 +403,12 @@ export function cpp_decode_GPUBufferDescriptor(ptr: number): GPUBufferDescriptor
 		usage: Engine.mem_u32[(ptr + 4) >> 2],
 	};
 };
-const cpp_enum_GPUAddressMode: GPUAddressMode[] = [
+const cpp_enum_GPUAddressMode = cpp_enum_define_literals<GPUAddressMode>(
 	undefined!, "clamp-to-edge", "repeat", "mirror-repeat"
-];
-const cpp_enum_GPUFilterMode: GPUFilterMode[] = [
+);
+const cpp_enum_GPUFilterMode = cpp_enum_define_literals<GPUFilterMode>(
 	undefined!, "nearest", "linear"
-];
+);
 export const cpp_sizeof_GPUSamplerDescriptor = 36;
 export function cpp_decode_GPUSamplerDescriptor(ptr: number): GPUSamplerDescriptor {
 	return {
@@ -439,9 +454,9 @@ export function cpp_decode_GPUBindGroupDescriptor(ptr: number): GPUBindGroupDesc
 		entries: cpp_decode_Array(ptr + 4, 24, (e_ptr) => cpp_decode_GPUBindGroupEntry(e_ptr)),
 	};
 };
-const cpp_enum_GPUBufferBindingType: GPUBufferBindingType[] = [
+const cpp_enum_GPUBufferBindingType = cpp_enum_define_literals<GPUBufferBindingType>(
 	undefined!, "uniform", "storage", "read-only-storage"
-];
+);
 export const cpp_sizeof_GPUBufferBindingLayout = 12;
 export function cpp_decode_GPUBufferBindingLayout(ptr: number): GPUBufferBindingLayout {
 	return {
@@ -450,18 +465,18 @@ export function cpp_decode_GPUBufferBindingLayout(ptr: number): GPUBufferBinding
 		minBindingSize: Engine.mem_u32[(ptr + 8) >> 2],
 	};
 };
-const cpp_enum_GPUSamplerBindingType: GPUSamplerBindingType[] = [
+const cpp_enum_GPUSamplerBindingType = cpp_enum_define_literals<GPUSamplerBindingType>(
 	undefined!, "filtering", "non-filtering", "comparison"
-];
+);
 export const cpp_sizeof_GPUSamplerBindingLayout = 4;
 export function cpp_decode_GPUSamplerBindingLayout(ptr: number): GPUSamplerBindingLayout {
 	return {
 		type: cpp_enum_GPUSamplerBindingType[Engine.mem_u32[(ptr + 0) >> 2]],
 	};
 };
-const cpp_enum_GPUTextureSampleType: GPUTextureSampleType[] = [
+const cpp_enum_GPUTextureSampleType = cpp_enum_define_literals<GPUTextureSampleType>(
 	undefined!, "float", "unfilterable-float", "depth", "sint", "uint"
-];
+);
 export const cpp_sizeof_GPUTextureBindingLayout = 12;
 export function cpp_decode_GPUTextureBindingLayout(ptr: number): GPUTextureBindingLayout {
 	return {
@@ -487,64 +502,64 @@ export function cpp_decode_GPUBindGroupLayoutDescriptor(ptr: number): GPUBindGro
 	};
 };
 export class cpp_GPUDevice {
-	static cpp_destroy0(_this: number): void {
+	static cpp_GPUDevice_destroy0(_this: number): void {
 		const arg_this = Engine.externref_table.get(_this) as GPUDevice;
 		arg_this.destroy();
 	}
-	static cpp_createCommandEncoder0(_this: number, _retHandle: number): void {
+	static cpp_GPUDevice_createCommandEncoder0(_this: number, _retHandle: number): void {
 		const arg_this = Engine.externref_table.get(_this) as GPUDevice;
 		const ret = arg_this.createCommandEncoder();
 		Engine.externref_table.set(_retHandle, ret);
 	}
-	static cpp_createTexture1(_this: number, descriptor: number, _retHandle: number): void {
+	static cpp_GPUDevice_createTexture1(_this: number, descriptor: number, _retHandle: number): void {
 		const arg_this = Engine.externref_table.get(_this) as GPUDevice;
 		const arg_descriptor = cpp_decode_GPUTextureDescriptor(descriptor);
 		const ret = arg_this.createTexture(arg_descriptor);
 		Engine.externref_table.set(_retHandle, ret);
 	}
-	static cpp_createShaderModule1(_this: number, descriptor: number, _retHandle: number): void {
+	static cpp_GPUDevice_createShaderModule1(_this: number, descriptor: number, _retHandle: number): void {
 		const arg_this = Engine.externref_table.get(_this) as GPUDevice;
 		const arg_descriptor = cpp_decode_GPUShaderModuleDescriptor(descriptor);
 		const ret = arg_this.createShaderModule(arg_descriptor);
 		Engine.externref_table.set(_retHandle, ret);
 	}
-	static cpp_createPipelineLayout1(_this: number, descriptor: number, _retHandle: number): void {
+	static cpp_GPUDevice_createPipelineLayout1(_this: number, descriptor: number, _retHandle: number): void {
 		const arg_this = Engine.externref_table.get(_this) as GPUDevice;
 		const arg_descriptor = cpp_decode_GPUPipelineLayoutDescriptor(descriptor);
 		const ret = arg_this.createPipelineLayout(arg_descriptor);
 		Engine.externref_table.set(_retHandle, ret);
 	}
-	static cpp_createRenderPipeline1(_this: number, descriptor: number, _retHandle: number): void {
+	static cpp_GPUDevice_createRenderPipeline1(_this: number, descriptor: number, _retHandle: number): void {
 		const arg_this = Engine.externref_table.get(_this) as GPUDevice;
 		const arg_descriptor = cpp_decode_GPURenderPipelineDescriptor(descriptor);
 		const ret = arg_this.createRenderPipeline(arg_descriptor);
 		Engine.externref_table.set(_retHandle, ret);
 	}
-	static cpp_createBuffer1(_this: number, descriptor: number, _retHandle: number): void {
+	static cpp_GPUDevice_createBuffer1(_this: number, descriptor: number, _retHandle: number): void {
 		const arg_this = Engine.externref_table.get(_this) as GPUDevice;
 		const arg_descriptor = cpp_decode_GPUBufferDescriptor(descriptor);
 		const ret = arg_this.createBuffer(arg_descriptor);
 		Engine.externref_table.set(_retHandle, ret);
 	}
-	static cpp_createSampler1(_this: number, descriptor: number, _retHandle: number): void {
+	static cpp_GPUDevice_createSampler1(_this: number, descriptor: number, _retHandle: number): void {
 		const arg_this = Engine.externref_table.get(_this) as GPUDevice;
 		const arg_descriptor = cpp_decode_GPUSamplerDescriptor(descriptor);
 		const ret = arg_this.createSampler(arg_descriptor);
 		Engine.externref_table.set(_retHandle, ret);
 	}
-	static cpp_createBindGroup1(_this: number, descriptor: number, _retHandle: number): void {
+	static cpp_GPUDevice_createBindGroup1(_this: number, descriptor: number, _retHandle: number): void {
 		const arg_this = Engine.externref_table.get(_this) as GPUDevice;
 		const arg_descriptor = cpp_decode_GPUBindGroupDescriptor(descriptor);
 		const ret = arg_this.createBindGroup(arg_descriptor);
 		Engine.externref_table.set(_retHandle, ret);
 	}
-	static cpp_createBindGroupLayout1(_this: number, descriptor: number, _retHandle: number): void {
+	static cpp_GPUDevice_createBindGroupLayout1(_this: number, descriptor: number, _retHandle: number): void {
 		const arg_this = Engine.externref_table.get(_this) as GPUDevice;
 		const arg_descriptor = cpp_decode_GPUBindGroupLayoutDescriptor(descriptor);
 		const ret = arg_this.createBindGroupLayout(arg_descriptor);
 		Engine.externref_table.set(_retHandle, ret);
 	}
-	static cpp_queue(_this: number, _retHandle: number): void {
+	static cpp_GPUDevice_queue(_this: number, _retHandle: number): void {
 		const arg_this = Engine.externref_table.get(_this) as GPUDevice;
 		const ret = arg_this.queue;
 		Engine.externref_table.set(_retHandle, ret);
@@ -560,15 +575,22 @@ export function cpp_decode_GPUCanvasConfiguration(ptr: number): GPUCanvasConfigu
 	};
 };
 export class cpp_GPUCanvasContext {
-	static cpp_configure1(_this: number, configuration: number): void {
+	static cpp_GPUCanvasContext_configure1(_this: number, configuration: number): void {
 		const arg_this = Engine.externref_table.get(_this) as GPUCanvasContext;
 		const arg_configuration = cpp_decode_GPUCanvasConfiguration(configuration);
 		arg_this.configure(arg_configuration);
 	}
-	static cpp_getCurrentTexture0(_this: number, _retHandle: number): void {
+	static cpp_GPUCanvasContext_getCurrentTexture0(_this: number, _retHandle: number): void {
 		const arg_this = Engine.externref_table.get(_this) as GPUCanvasContext;
 		const ret = arg_this.getCurrentTexture();
 		Engine.externref_table.set(_retHandle, ret);
+	}
+};
+export class cpp_GPU {
+	static cpp_GPU_getPreferredCanvasFormat0(_this: number, _ret: number): void {
+		const arg_this = Engine.externref_table.get(_this) as GPU;
+		const ret = arg_this.getPreferredCanvasFormat();
+		Engine.mem_u32[(_ret) >> 2] = cpp_enum_GPUTextureFormat.lookup.get(ret) || 0;
 	}
 };
 export const cpp_module_api_webgpu = [
@@ -587,4 +609,5 @@ export const cpp_module_api_webgpu = [
 	cpp_GPUShaderModule,
 	cpp_GPUDevice,
 	cpp_GPUCanvasContext,
+	cpp_GPU,
 ];

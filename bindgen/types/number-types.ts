@@ -52,6 +52,31 @@ export class U32Type extends Type<number> {
     generateDefaultValExpr(val: number): string { return val.toString(); }
 }
 
+export class I32Type extends Type<number> {
+
+    constructor() {
+        super({
+            sizeOf: 4,
+            alignOf: 4,
+            kind: Kind.ValueType,
+            cppName: `i32`,
+            cppInteropName: "i32",
+            tsName: `number`,
+            isOptionalAllowed: false,
+            isConst: false
+        });
+    }
+
+    cpp2js(val: Val): string {
+        return val.u32;
+    }
+    js2cpp(ptr: Val, val: string): string {
+        return `${ptr.u32} = ${val}`;
+    }
+
+    generateDefaultValExpr(val: number): string { return val.toString(); }
+}
+
 export class F32Type extends Type<number> {
 
     constructor() {

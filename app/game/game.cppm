@@ -3,7 +3,7 @@ export module game.game;
 export import api;
 export import core;
 export import rendering;
-
+import webgpu;
 import game.ui_event_handler; 
 
 export struct Game {

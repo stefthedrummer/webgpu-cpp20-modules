@@ -25,7 +25,7 @@ export class EnumFlagsType<T extends number> extends Type<T> {
         }
         srcCpp.push(`};`);
 
-        srcCpp.push(`inline ${this.cppName} operator |(${this.cppName} l, ${this.cppName} r) { return (${this.cppName})((u32)l | (u32)r); }`);
+        srcCpp.push(`inline constexpr ${this.cppName} operator |(${this.cppName} l, ${this.cppName} r) { return (${this.cppName})((u32)l | (u32)r); }`);
     }
 
     cpp2js(val: Val): string {

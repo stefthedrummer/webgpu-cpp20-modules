@@ -20,6 +20,6 @@ export class StringType extends Type<string> {
         return `cpp_decode_String(${val.address.u32})`;
     }
     js2cpp(ptr: Val, val: string): string {
-        return `missing`;
+        return `missing-string`;
     }
 }

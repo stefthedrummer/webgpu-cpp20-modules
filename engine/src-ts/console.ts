@@ -3,13 +3,15 @@ import { Engine } from "./engine";
 
 enum ArgType {
     Int = 1,
-    Chars = 2
+    Float = 2,
+    Chars = 3
 };
 
 class Arg {
     constructor(
         public readonly type: ArgType,
-        public readonly val: number) { }
+        public readonly valInt: number,
+        public readonly valFloat: number) { }
 };
 
 type LoggerFn = (msg: string) => void;
@@ -36,16 +38,20 @@ export class Console {
     static cpp_format(loggerFn: number, pArgs: number) {
         const args = cpp_decode_Array(pArgs, 8, ptr => new Arg(
             Engine.mem_u32[(ptr + 0) >> 2],
-            Engine.mem_u32[(ptr + 4) >> 2]
+            Engine.mem_u32[(ptr + 4) >> 2],
+            Engine.mem_f32[(ptr + 4) >> 2]
         ))
 
         g_loggerFns[loggerFn](args.map(arg => {
             switch (arg.type) {
                 case ArgType.Int: {
-                    return arg.val;
+                    return arg.valInt;
+                }
+                case ArgType.Float: {
+                    return arg.valFloat.toFixed(4)
                 }
                 case ArgType.Chars: {
-                    return cpp_decode_String(arg.val);
+                    return cpp_decode_String(arg.valInt);
                 }
                 default: {
                     return "?";
