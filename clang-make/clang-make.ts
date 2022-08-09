@@ -21,13 +21,13 @@ const config: Config = {
         "-std=c++20",
         "-fmodules",
         "-mbulk-memory",
-        "-Os",
+        "-O2",
         "-fno-rtti",
         "-flto"
     ],
     clangCArguments: [
         "--target=wasm32-wasi",
-        "-Os",
+        "-O2",
         "-flto"
     ],
     clangdArguments: [
@@ -37,9 +37,8 @@ const config: Config = {
     ],
     wasmldArguments: [
         "--no-entry",
-        "-O3",
-        "--export-dynamic",
-        "--lto-O3",
+        //"-O3",
+        //"--lto-O3",
         "--strip-all",
         "--gc-sections"
     ],

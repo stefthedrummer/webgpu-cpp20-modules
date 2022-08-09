@@ -169,7 +169,7 @@ export class Interface<T> extends Item {
 
     generateCpp(srcCpp: string[]): void {
 
-        srcCpp.push(`struct ${this.name} {`);
+        srcCpp.push(`struct I${this.name} {`);
         srcCpp.push(`private:`);
 
         for (const memberDef of this.memberDefs) {
@@ -225,7 +225,7 @@ export class Interface<T> extends Item {
             if (memberDef.retType.kind == Kind.Handle) {
                 srcCpp.push(`\t\tu32 const _retHandle = pScope->externrefScope.AcquireLocal();`);
             }
-            srcCpp.push(`\t\t${this.name}::cpp_${memberDef.prop}(${args});`);
+            srcCpp.push(`\t\tI${this.name}::cpp_${memberDef.prop}(${args});`);
             if (memberDef.retType.kind == Kind.Handle) {
                 srcCpp.push(`\t\treturn ${memberDef.retType.cppName}{_retHandle};`);
             }
@@ -260,7 +260,7 @@ export class Interface<T> extends Item {
         srcCpp.push(`};`);
 
         for (const iface of this.assignableFrom) {
-            srcCpp.push(`template<> inline constexpr bool InterfaceCompatibilityTable<${iface.name}, ${this.name}> = true;`);
+            srcCpp.push(`template<> inline constexpr bool InterfaceCompatibilityTable<${iface.name}, I${this.name}> = true;`);
         }
     }
 

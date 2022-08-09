@@ -3,7 +3,6 @@ export module core.buffer;
 import core.debug;
 import core.wasm;
 import core.types;
-import core.memory;
 import core.math;
 import core.meta;
 import api.console;

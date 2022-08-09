@@ -11,18 +11,21 @@ This project enables developing games with Web-GPU and C++20-Modules.
 - A a little sample that displays a texture on the screen
 
 # Setup
-_(Tested on Windows and VS-Code)_
+_(Tested on Windows/Linux and VS-Code)_
 
 Requirements:
-- Browser with WebGPU Support (e.g. Chrome)
-- Clang/LLCM 14
-- npm
-- VS-Code (recommended)
-- LiveServer VS-Code-Extension (recommended)
-- Clangd VS-Code-Extension (recommended)
-- WebAssembly-WABT Binary Toolkit
-    - download a release under https://github.com/WebAssembly/wabt/releases
-    - make sure the directory of the ```war2wasm``` executable in your ```PATH``` environment variable.
+| Item                | Minimum Version | Build | IDE | Execution |                                                      |
+| ------------------- | --------------- | ----- | --- | --------- | ---------------------------------------------------- |
+| Chrome              | v94             |       |     | X         |                                                      |
+| Clang/LLvmm         | 14.0.6          | X     |     |           |                                                      |
+| npm                 |                 | X     | X   |           |                                                      |
+| node                | 16              | X     | X   |           |                                                      |
+| ts-node             | 10.7.0          | X     | X   |           |                                                      |
+| VS-Code             | any             |       | X   |           |                                                      |
+| VS-Code::LiveServer | any             |       | X   |           |                                                      |
+| VS-Code::Clangd     | any             |       | X   |           |                                                      |
+| WABT Binary Toolkit | any             | X     |     |           | [link](https://github.com/WebAssembly/wabt/releases) |
+
 
 Steps:
 - clone
@@ -54,26 +57,26 @@ Clang-Make finds all sources automatically and is configured under ```./clang-ma
 
 # Folder Structure
 
-| File/Dir  | Explanation |
-| ------------- | ------------- |
-| ```./app   ```      | Your C++ code  |
-| ```./bin/assets```  | Your assets  |
-| ```./bin/build/bin``` | output for object-files |
-| ```./bin/build/modules``` | output for precompiled-module-files |
-| ```./bin/build/clang-make-cache.Json``` | build-tool cache |
-| ```./bindgen``` | the c++ to Js binding generator used to generate the webgpu api and other stuff |
-| ```./clang-make``` | src of the build-tool |
-| ```./engine``` | library code |
+| File/Dir                                | Explanation                                                                     |
+| --------------------------------------- | ------------------------------------------------------------------------------- |
+| ```./app   ```                          | Your C++ code                                                                   |
+| ```./bin/assets```                      | Your assets                                                                     |
+| ```./bin/build/bin```                   | output for object-files                                                         |
+| ```./bin/build/modules```               | output for precompiled-module-files                                             |
+| ```./bin/build/clang-make-cache.Json``` | build-tool cache                                                                |
+| ```./bindgen```                         | the c++ to Js binding generator used to generate the webgpu api and other stuff |
+| ```./clang-make```                      | src of the build-tool                                                           |
+| ```./engine```                          | library code                                                                    |
 
 # Core-Library :: Memory-Management
 
 The library makes use of allocators. Currently there are 3:
 
-| Allocator  | Explanation |
-| ------------- | ------------- |
+| Allocator    | Explanation                     |
+| ------------ | ------------------------------- |
 | ```Borrow``` | a borowed object - like in rust |
-| ```Heap```   | a heap-allocated object |
-| ```Scope```  | a stack-allocated object |
+| ```Heap```   | a heap-allocated object         |
+| ```Scope```  | a stack-allocated object        |
 
 By default every memory-managed object uses the ```Borrow``` allocator when not specified,
 this is usefull because a lot of occurences are parameters, and we most likely wanna borrow the object. 
@@ -147,11 +150,11 @@ In the framework a reference to an Js-object is called a ```Handle```.
 Thankfully this is abstracted away. We only have to tell the framework whether a handler is temporary or persistent.
 There are 2 types of handles:
 
-| Handle  | Explanation |
-| ------------- | ------------- |
-| ```LocalHandle<T>``` | temporary handle, gets gc-ed at the end of the ```scope``` |
-| ```PersistentHandle<T>```   | persistent handle, doesn't get gc-ed |
-| (```Handle<T>```)   | used in parameters - means any handle |
+| Handle                    | Explanation                                                |
+| ------------------------- | ---------------------------------------------------------- |
+| ```LocalHandle<T>```      | temporary handle, gets gc-ed at the end of the ```scope``` |
+| ```PersistentHandle<T>``` | persistent handle, doesn't get gc-ed                       |
+| (```Handle<T>```)         | used in parameters - means any handle                      |
 
 Everytime a C++-to-Js-Call returns a Js-object, the 
 bind-generator gives us a Handle instead.

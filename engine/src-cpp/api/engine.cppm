@@ -17,8 +17,8 @@ export namespace Engine {
 	wasm_import("cpp_getCanvasContext") u32 cpp_getCanvasContext();
 	wasm_import("cpp_requestAnimationFrame") void cpp_requestAnimationFrame(u32 millis, Callback fnCallback);
 
-	inline PersistentHandle<GPUDevice> GetDevice() { return PersistentHandle<GPUDevice>{cpp_getDevice()}; }
-	inline PersistentHandle<GPUCanvasContext> GetCanvasContext() { return PersistentHandle<GPUCanvasContext>{cpp_getCanvasContext()}; }
+	inline PersistentHandle<IGPUDevice> GetDevice() { return PersistentHandle<IGPUDevice>{cpp_getDevice()}; }
+	inline PersistentHandle<IGPUCanvasContext> GetCanvasContext() { return PersistentHandle<IGPUCanvasContext>{cpp_getCanvasContext()}; }
 	inline void RequestAnimationFrame(u32 millis, Callback fnCallback) { cpp_requestAnimationFrame(millis, fnCallback); }
 }
 

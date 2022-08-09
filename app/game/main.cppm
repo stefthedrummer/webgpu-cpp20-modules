@@ -28,9 +28,9 @@ wasm_export("app_main") void AppMain() {/**/
     }], &Start);
 }
 
- PersistentHandle<GPUBuffer> hVertexBuffer{};
+ PersistentHandle<IGPUBuffer> hVertexBuffer{};
 
-void Start() {
+void Start() { 
     Scope scope{ 32 };
     auto hDevice = g_game.hDevice = Engine::GetDevice();
     auto hCanvasContext = g_game.hCanvasContext = Engine::GetCanvasContext();

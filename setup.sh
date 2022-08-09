@@ -5,7 +5,7 @@ popd
 
 pushd "engine/src-ts"
 npm install
-npx tsc
+tsc
 popd
 
 pushd "."

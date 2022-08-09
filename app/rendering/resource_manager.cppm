@@ -16,10 +16,10 @@ export struct Vertex {
 
 export struct ResourceManager {
 
-    Array<PersistentHandle<GPUTexture>, Heap> hTextures{ 0, nullptr };
+    Array<PersistentHandle<IGPUTexture>, Heap> hTextures{ 0, nullptr };
     
     template<typename TVertex>
-    PersistentHandle<GPUBuffer> CreateVertexBuffer(Array<TVertex> vertices, Handle<GPUDevice> hDevice) {
+    PersistentHandle<IGPUBuffer> CreateVertexBuffer(Array<TVertex> vertices, Handle<IGPUDevice> hDevice) {
         Scope scope{ 4 };
 
         auto hVertexBuffer = !hDevice->CreateBuffer(GPUBufferDescriptor{
@@ -38,11 +38,11 @@ export struct ResourceManager {
         return hVertexBuffer;
     }
 
-    void CreateAtlas(Atlas* pAtlas, Image<Borrow>* pAtlasImg, Handle<GPUDevice> hDevice) {
+    void CreateAtlas(Atlas* pAtlas, Image<Borrow>* pAtlasImg, Handle<IGPUDevice> hDevice) {
         Scope scope{ 32 };
 
         auto hQueue{ hDevice->Queue(&scope) };
-        Array<PersistentHandle<GPUTexture>, Heap> hTextures{ pAtlas->textures.length() };
+        Array<PersistentHandle<IGPUTexture>, Heap> hTextures{ pAtlas->textures.length() };
 
         for (u32 iTexture = 0; iTexture < pAtlas->textures.length(); iTexture++) {
             auto pTexture = &pAtlas->textures[iTexture];

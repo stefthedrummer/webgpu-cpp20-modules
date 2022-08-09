@@ -4,7 +4,6 @@ import core.debug;
 export import core.types;
 export import core.meta;
 export import core.allocator;
-export import core.memory;
 export import core.initializer_list;
 
 export{
@@ -29,7 +28,7 @@ struct Array : TAllocator::template Base<T, TAllocator, Array, T>  {
     inline constexpr Array(std::initializer_list<T> init, AllocatorHandle allocatorHandle = AllocatorHandle{}) :
         Base{ init.size(), allocatorHandle } {
 
-        copy(this->mem.pElements, init.begin(), init.size());
+        __builtin_memcpy(this->mem.pElements, init.begin(), init.size() * sizeof(T));
     }
 
     inline constexpr u32 length() { return this->mem.length; }

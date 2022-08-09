@@ -9,7 +9,7 @@ export class HandleType<T> extends Type<T> {
             sizeOf: 4,
             alignOf: 4,
             kind: Kind.Handle,
-            cppName: `${cppHandletype}<${iface.name}>`,
+            cppName: `${cppHandletype}<I${iface.name}>`,
             cppInteropName: "u32",
             tsName: iface.name,
             isOptionalAllowed: false,

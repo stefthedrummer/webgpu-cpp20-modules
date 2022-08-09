@@ -7,8 +7,8 @@ export import rendering;
 import game.ui_event_handler; 
 
 export struct Game {
-    PersistentHandle<GPUDevice> hDevice{};
-    PersistentHandle<GPUCanvasContext> hCanvasContext{};
+    PersistentHandle<IGPUDevice> hDevice{};
+    PersistentHandle<IGPUCanvasContext> hCanvasContext{};
 
     ResourceManager resourceManager{};
     Renderer renderer{};

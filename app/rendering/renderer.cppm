@@ -10,14 +10,14 @@ export struct Renderer {
 
     Camera camera{};
 
-    PersistentHandle<GPUBuffer> hCameraBuffer{};
-    PersistentHandle<GPUSampler> hLinearSampler{};
-    PersistentHandle<GPUBindGroupLayout> hBindGroupLayout0{};
-    PersistentHandle<GPUPipelineLayout> hPipelineLayout{};
-    PersistentHandle<GPUShaderModule> hShaderModule{};
-    PersistentHandle<GPURenderPipeline> hRenderPipeline0{};
+    PersistentHandle<IGPUBuffer> hCameraBuffer{};
+    PersistentHandle<IGPUSampler> hLinearSampler{};
+    PersistentHandle<IGPUBindGroupLayout> hBindGroupLayout0{};
+    PersistentHandle<IGPUPipelineLayout> hPipelineLayout{};
+    PersistentHandle<IGPUShaderModule> hShaderModule{};
+    PersistentHandle<IGPURenderPipeline> hRenderPipeline0{};
 
-    void Setup(Handle<GPUDevice> hDevice, Handle<GPUCanvasContext> hCanvasContext, char const* pShaderSource) {
+    void Setup(Handle<IGPUDevice> hDevice, Handle<IGPUCanvasContext> hCanvasContext, char const* pShaderSource) {
         Scope scope{ 32 };
 
         hCanvasContext->Configure({
@@ -121,7 +121,7 @@ export struct Renderer {
             }, & scope);
     };
 
-    void UpdateCameraBuffer(Handle<GPUQueue> hQueue) {
+    void UpdateCameraBuffer(Handle<IGPUQueue> hQueue) {
 
         hQueue->WriteBuffer(WriteBufferParamStruct{
             .buffer = this->hCameraBuffer,
