@@ -5,6 +5,23 @@ import api;
 import core;
 import webgpu;
 import rendering.camera;
+import rendering.terrain;
+
+export struct Vertex {
+    vec2<f32> pos;
+    vec2<f32> uv;
+};
+
+export struct Instance {
+    vec2<f32> pos;
+    i32 sprite;
+    i32 __padding0;
+};
+
+export struct Globals {
+    CameraProps camera{};
+    TerrainProps terrain{};
+};
 
 export using DefaultBindingLayoutSignature = Signature<
     SamplerBinding,
@@ -20,26 +37,13 @@ export using DefaultBindingSignature = Signature<
     Texture<rgba<u8>>,
     Texture<u8>,
     Texture<vec2<snorm8>>,
-    GPUBuffer<Camera>
+    GPUBuffer<Globals>
 >;
 
-export struct Vertex {
-    vec2<f32> pos;
-    vec2<f32> uv;
-};
-
-export struct Instance {
-    vec2<f32> pos;
-    i32 sprite;
-    i32 __padding0;
-};
-
-export struct Renderer {
-
-    Camera camera{};
+export struct Renderer : Globals {
 
     GPU gpu{};
-    GPUBuffer<Camera> cameraBuffer{};
+    GPUBuffer<Globals> globalsBuffer{};
     Sampler linearSampler{};
     Sampler pointSampler{};
 
@@ -49,13 +53,15 @@ export struct Renderer {
     RenderPipeline renderPipeline_Terrain{};
     RenderPipeline renderPipeline_Highlight{};
 
+    TerrainResources terrainResources{};
+
     void Setup(char const* pShaderSource) {
         Scope scope{ 32 };
 
         gpu = GPU::Create();
         gpu.Configure();
 
-        this->cameraBuffer =  gpu.CreateBuffer<Camera>(1, UniformBuffer);
+        this->globalsBuffer = gpu.CreateBuffer<Globals>(1, UniformBuffer);
         this->linearSampler = gpu.CreateSampler(GPUFilterMode::Linear, GPUAddressMode::Repeat);
         this->pointSampler = gpu.CreateSampler(GPUFilterMode::Nearest);
 
@@ -122,7 +128,7 @@ export struct Renderer {
             });
     }
 
-    inline void WriteCamera() {
-        this->gpu.WriteBuffer(&cameraBuffer, &camera);
+    inline void WriteGlobals() {
+        this->gpu.WriteBuffer<Globals>(&globalsBuffer, this);
     }
 };

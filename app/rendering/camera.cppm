@@ -3,7 +3,7 @@ export module rendering.camera;
 import core.types;
 import core.math;
 
-export struct Camera {
+export struct CameraProps {
     vec2<f32> size;
     f32 aspectRatio;
     f32 zoom = 5.0f;

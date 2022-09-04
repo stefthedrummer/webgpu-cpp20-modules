@@ -13,6 +13,8 @@ struct VertexOut {
     instanceSprite : i32
 };
 
+
+
 struct Camera {
     size: vec2<f32>,
     aspectRatio: f32,

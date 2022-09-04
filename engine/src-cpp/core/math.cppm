@@ -7,32 +7,33 @@ struct vec2 {
     T x;
     T y;
 
-    inline vec2<T> operator +(vec2<T> const& o) const
-    {
-        return vec2<T>{x + o.x, y + o.y};
-    }
-
-    inline vec2<T> operator -(vec2<T> const& o) const
-    {
-        return vec2<T>{x - o.x, y - o.y};
-    }
+    template<typename S>
+    inline auto operator +(S const& o) const
+    {  return vec2<decltype(x+o.x)>{x + o, y + o}; }
+    
+    template<typename S>
+    inline auto operator +(vec2<S> const& o) const
+    {  return vec2<decltype(x+o.x)>{x + o.x, y + o.y};  }
 
     template<typename S>
-    inline vec2<T> operator *(S  s) const
-    {
-        return vec2<T>{x* s, y* s};
-    }
+    inline auto operator -(vec2<S> const& o) const
+    {  return vec2<decltype(x-o.x)>{x - o.x, y - o.y};  }
 
     template<typename S>
-    inline vec2<T> operator +(S const& o) const
-    {
-        return vec2<T>{x + o, y + o};
-    }
+    inline auto operator *(S s) const
+    { return vec2<decltype(x*s)>{x*s, y*s};  }
+
+    template<typename S>
+    inline auto operator *(vec2<S>  o) const
+    { return vec2<decltype(x*o.x)>{x*o.x, y*o.y};  }
+
+    template<typename S>
+    inline auto operator /(vec2<S>  o) const
+    { return vec2<decltype(x/o.x)>{x*o.x, y*o.y};  }
 
     template<typename C>
-    inline explicit operator vec2<C>() {
-        return vec2<C> { (C)x, (C)y };
-    }
+    inline explicit operator vec2<C>()
+    { return vec2<C> { (C)x, (C)y }; }
 
     template<typename C>
     inline constexpr vec2<C> Map(C(fn)(T s)) {

@@ -93,7 +93,8 @@ void AppTick() {
 
     g_game.uiEventHandler.PollUIEvents();
     g_game.renderer.camera.Update();
-    g_game.renderer.WriteCamera();
+    g_game.renderer.terrain.Update(&g_game.renderer.terrainResources);
+    g_game.renderer.WriteGlobals();
 
     CommandEncoder commandEncoder = g_game.renderer.gpu.CreateCommandEncoder(&scope);
 
@@ -103,7 +104,7 @@ void AppTick() {
         &g_game.resourceManager.atlas[1],
         &terrainTexture,
         &noiseTexture,
-        &g_game.renderer.cameraBuffer);
+        &g_game.renderer.globalsBuffer);
 
     RenderPassEncoder cmd = commandEncoder.BeginRenderPass(scope[{
             GPURenderPassColorAttachment{
