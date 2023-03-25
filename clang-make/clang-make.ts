@@ -17,6 +17,7 @@ const config: Config = {
     buildDir: "bin/build",
     distDit: "bin",
     clangCppArguments: [
+        "-g",
         "--target=wasm32-wasi",
         "-std=c++20",
         "-fmodules",
@@ -26,7 +27,6 @@ const config: Config = {
         "-fno-rtti",
         //"-frtti",
         //"-flto",
-        "-g"
     ],
     clangCArguments: [
         "--target=wasm32-wasi",
@@ -39,6 +39,7 @@ const config: Config = {
         "-fmodules",
     ],
     wasmldArguments: [
+        "-g",
         "--no-entry",
         //"-O3",
         //"--lto-O3",
@@ -55,7 +56,7 @@ new Project(config)
     .collectSources()
     .emitArtifact(new CompileCommandsJson("compile_commands:json", FileInfo.create(".", "compile_commands", "json")))
     .emitArtifact(new AppWasm("app:wasm", FileInfo.create(config.distDit, "game", "wasm")))
-    .build(Stage.Link, false);
+    .build(Stage.Link, true);
 
 
 
