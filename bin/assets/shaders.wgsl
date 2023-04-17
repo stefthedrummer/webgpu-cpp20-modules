@@ -54,7 +54,7 @@ fn vertex_default(
 @fragment
 fn fragment_terrain(v: VertexOut) -> @location(0) vec4<f32>
 {
-    let terrainNoiseTexDim : vec2<i32> = textureDimensions(terrainNoiseTex, 0);
+    let terrainNoiseTexDim : vec2<u32> = textureDimensions(terrainNoiseTex, 0);
 
     var grad : vec2<f32> = textureSample(terrainNoiseTex, linearSpr, v.worldPos / 4.0f).xy;
 

@@ -18,6 +18,7 @@ const config: Config = {
     distDit: "bin",
     clangCppArguments: [
         "-g",
+        "-gdwarf-4",
         "--target=wasm32-wasi",
         "-std=c++20",
         "-fmodules",
@@ -39,8 +40,7 @@ const config: Config = {
         "-fmodules",
     ],
     wasmldArguments: [
-        "-g",
-        "--no-entry",
+        "--no-entry"
         //"-O3",
         //"--lto-O3",
         //"--strip-all",
